@@ -1,5 +1,5 @@
 {
-    "name": "lduer/kimai-clock-in",
+    "name": "lduer/kimai-clock-in-bundle",
     "type": "symfony-bundle",
     "description": "clock-in/out features for kimai2",
     "license": "MIT",
