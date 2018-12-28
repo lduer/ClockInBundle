@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+{% import "macros/widgets.html.twig" as widgets %}
+{% trans_default_domain 'clock-in' %}
+{% block page_title %}{{ 'clock_in.title'|trans }}{% endblock %}
+{#{% block page_subtitle %}{{ 'clock_in.subtitle'|trans }}{% endblock %}#}
+
+{% block page_content_class %}{{ parent() }} Clock-in{% endblock %}
+
+{% block main %}
+
+    {% for row in widget_rows %}
+        {% embed 'dashboard/section-simple.html.twig' with { section: row } %}{% endembed %}
+    {% endfor %}
+
+    <div class="row">
+        <div class="col-md-12 col-sm-24 col-xs-48">
+        {% for timesheet in recent_activities %}
+            <div class="info-box">
+                <div class="info-box-content" style="margin-left: 0">
+                    <div class="info-box-text">
+                        last booking: {{ timesheet.end|date }}
+
+                    </div>
+                    <div class="info-box-number">
+                        {{ 'recent.activities.format'|trans({'%activity%': timesheet.activity.name, '%project%': timesheet.project.name, '%customer%': timesheet.project.customer.name},'messages') }}
+                    </div>
+                    <div class="info-box-number">
+                        <a href="{{ path('timesheet_start', {'id' : timesheet.id}) }}">
+                            <i class="{{ 'start-small'|icon }} text-green"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        {#<li class="footer"><a href="{{ url('timesheet') }}">{{ 'timesheet.all'|trans({},'messages') }}</a></li>#}
+        </div>
+    </div>
+
+    clock_in form:
+
+
+{% endblock %}

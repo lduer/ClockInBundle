@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file date="2018-12-26T12:00:00Z" source-language="en" target-language="en" datatype="plaintext" original="none">
+        <body>
+            <trans-unit id="clock-in.title">
+                <source>clock-in.title</source>
+                <target>Clock-in booking</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
