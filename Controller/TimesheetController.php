@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Kimai time-tracking app.
+ * This file is part of the Kimai Clock-In bundle.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -26,7 +26,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class TimesheetController extends TimesheetControllerBase
 {
-
     /**
      * @Route(path="/export", name="timesheet_export", methods={"GET"})
      *
@@ -102,7 +101,6 @@ class TimesheetController extends TimesheetControllerBase
     public function startAction(ValidatorInterface $validator, Timesheet $timesheet)
     {
         return parent::startAction($validator, $timesheet);
-
 
         return $this->redirectToRoute('timesheet');
     }

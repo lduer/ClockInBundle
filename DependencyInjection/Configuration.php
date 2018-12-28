@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Kimai time-tracking app.
+ * This file is part of the Kimai Clock-In bundle.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -9,8 +9,6 @@
 
 namespace LDuer\KimaiClockInBundle\DependencyInjection;
 
-use App\Model\DashboardSection;
-use App\Model\Widget;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -105,7 +103,6 @@ class Configuration implements ConfigurationInterface
 //                    ->defaultValue([])
 //                ->end()
 //            ->end()
-        ;
 
         return $node;
     }

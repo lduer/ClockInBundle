@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Kimai time-tracking app.
+ * This file is part of the Kimai Clock-In bundle.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -30,17 +30,14 @@ class KimaiClockInExtension extends Extension implements PrependExtensionInterfa
 //        $configuration = new Configuration();
 //        $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yaml');
-
-
 
 //        $container->loadFromExtension('twig', array(
 //            'paths' => array(
 //                '' => 'KimaiClockInBundle',
 //            ),
 //        ));
-
 
 //        $configuration = new Configuration();
 //        try {

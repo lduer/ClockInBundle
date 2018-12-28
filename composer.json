@@ -9,8 +9,13 @@
             "email": "duerlukas@gmail.com"
         }
     ],
+    "require": {
+        "php": "^7.1.3"
+    },
     "require-dev": {
-        "kevinpapst/kimai2": "^0.6.1"
+        "kevinpapst/kimai2": "^0.6.1",
+        "friendsofphp/php-cs-fixer": "^2.10",
+        "symfony/phpunit-bridge": "^4.2"
     },
     "autoload": {
         "psr-4": { "LDuer\\KimaiClockInBundle\\": "" }
