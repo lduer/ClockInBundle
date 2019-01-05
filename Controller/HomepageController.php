@@ -32,7 +32,7 @@ class HomepageController extends AbstractController
     public function indexAction(Request $request)
     {
         // make me configurable via UserPreference
-        $route = 'clock_in_dashboard';
+        $route = 'clock_in_index';
 
         /** @var User $user */
         $user = $this->getUser();

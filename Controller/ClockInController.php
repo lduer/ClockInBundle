@@ -40,26 +40,38 @@ class ClockInController extends AbstractController
     }
 
     /**
-     * @Route(path="/", defaults={}, name="dashboard", methods={"GET"})
+     * @Route(path="/", defaults={}, name="index", methods={"GET"})
      */
     public function indexAction()
     {
         return $this->render('@KimaiClockIn/clock-in/index.html.twig', [
             'widget_rows' => $this->getDurationWeekWidget(),
-            'recent_activities' => $this->getRecentActivities()
+            'recent_activities' => $this->getRecentActivities(1)
         ]);
     }
 
-    protected function getRecentActivities()
+    /**
+     * @param int|null $number
+     * @return mixed
+     * @throws \Exception
+     */
+    protected function getRecentActivities(int $number = null)
     {
         $user = $this->getUser();
         $repository = $this->getDoctrine()->getRepository(Activity::class);
 
         $entries = $repository->getRecentActivities($user, new \DateTime('-30 days'));
 
+        if (null !== $number) {
+            $entries = array_slice($entries, 0, $number);
+        }
         return $entries;
     }
 
+    /**
+     * @return array
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
     protected function getDurationWeekWidget()
     {
         $widget = [
@@ -72,7 +84,6 @@ class ClockInController extends AbstractController
             'color' => 'blue'
         ];
 
-//        $data = $this->repository->getStatistic($widget['query'], $widget['begin'], $widget['end'], $widget['user']);
         $data = $this->repository->getStatistic($widget['query'], $widget['begin'], $widget['end'], $this->getUser());
 
         $row = new DashboardSection(null);

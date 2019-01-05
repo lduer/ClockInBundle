@@ -87,7 +87,7 @@ class TimesheetController extends TimesheetControllerBase
      */
     public function stopAction(Timesheet $entry)
     {
-        return $this->stop($entry, 'timesheet');
+        return $this->stop($entry, 'clock_in_index');
     }
 
     /**
@@ -102,19 +102,6 @@ class TimesheetController extends TimesheetControllerBase
     {
         return parent::startAction($validator, $timesheet);
 
-        return $this->redirectToRoute('timesheet');
-    }
-
-    /**
-     * The route to create a new entry by form.
-     *
-     * @Route(path="/create", name="timesheet_create", methods={"GET", "POST"})
-     *
-     * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     */
-    public function createAction(Request $request)
-    {
-        return $this->create($request, 'timesheet', 'timesheet/edit.html.twig');
+        return $this->redirectToRoute('clock_in_index');
     }
 }
