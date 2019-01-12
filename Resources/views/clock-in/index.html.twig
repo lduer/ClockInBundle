@@ -1,42 +1,79 @@
 {% extends 'base.html.twig' %}
 {% import "macros/widgets.html.twig" as widgets %}
 {% trans_default_domain 'clock-in' %}
-{% block page_title %}{{ 'clock_in.title'|trans }}{% endblock %}
-{#{% block page_subtitle %}{{ 'clock_in.subtitle'|trans }}{% endblock %}#}
+{% block page_title %}{{ 'clock_in.title'|trans({}, 'clock-in') }}{% endblock %}
+{% block page_subtitle %}{{ 'clock_in.subtitle'|trans }}{% endblock %}
 
 {% block page_content_class %}{{ parent() }} Clock-in{% endblock %}
 
 {% block main %}
 
-    {% for row in widget_rows %}
-        {% embed 'dashboard/section-simple.html.twig' with { section: row } %}{% endembed %}
-    {% endfor %}
-
     <div class="row">
         <div class="col-md-12 col-sm-24 col-xs-48">
-        {% for timesheet in recent_activities %}
             <div class="info-box">
                 <div class="info-box-content" style="margin-left: 0">
-                    <div class="info-box-text">
-                        last booking: {{ timesheet.end|date }}
+                    {{ 'info.last-booking'|trans }}
+                    {% if latest_activity is not null %}
+                        <div class="info-box-number">
+                            <div class="clock-in-info">
 
-                    </div>
-                    <div class="info-box-number">
-                        {{ 'recent.activities.format'|trans({'%activity%': timesheet.activity.name, '%project%': timesheet.project.name, '%customer%': timesheet.project.customer.name},'messages') }}
-                    </div>
-                    <div class="info-box-number">
-                        <a href="{{ path('timesheet_start', {'id' : timesheet.id}) }}">
-                            <i class="{{ 'start-small'|icon }} text-green"></i>
-                        </a>
-                    </div>
+                                {% if latest_activity.icon is not empty %}
+                                    <i class="{{ latest_activity.icon.name|icon }} text-{{ latest_activity.icon.color }}"></i>
+                                {% endif %}
+
+                                {% if clock_in_activity_id != latest_activity.activityId and latest_activity.action == constant('LDuer\\KimaiClockInBundle\\Entity\\LatestActivity::ACTIVITY_PAUSE') %}
+                                    {#pause text + project#}
+                                    ({{ ('label.'~latest_activity.action)|trans }}) <span
+                                        class="text-secondary text-muted">{{ latest_activity.activityName }}</span>
+                                    <div class="text-secondary text-muted">{{ latest_activity.projectName }}</div>
+
+                                {% elseif clock_in_activity_id != latest_activity.activityId and latest_activity.action == constant('LDuer\\KimaiClockInBundle\\Entity\\LatestActivity::ACTIVITY_RESUME') %}
+
+                                    {#resume: text + project#}
+                                    <span class="text-secondary text-muted">({{ ('label.'~latest_activity.action)|trans }})</span> {{ latest_activity.activityName }}
+                                    <div>{{ latest_activity.projectName }}</div>
+
+                                {% elseif latest_activity.action is not null %}
+
+                                    {# start/stop: only text#}
+                                    {{ ('label.'~latest_activity.action)|trans }}
+                                    <div>--</div>
+
+                                {% else %}
+                                    {# default: only project details #}
+                                    <span>{{ latest_activity.activityName }}</span>
+                                    <div>{{ latest_activity.projectName }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {{ 'info.booked-at'|trans }} <strong>{{ latest_activity.time|date('d.m.Y H:i:s') }}</strong>
+                    {% endif %}
                 </div>
             </div>
-        {% endfor %}
-        {#<li class="footer"><a href="{{ url('timesheet') }}">{{ 'timesheet.all'|trans({},'messages') }}</a></li>#}
         </div>
     </div>
 
-    clock_in form:
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3 col-sm-12 col-xs-12 text-center">
+            {{ form_start(form) }}
+            {{ form_row(form.start) }}
+            <div class="form-group">
+                {{ form_widget(form.pause) }}
+                {{ form_widget(form.resume) }}
+            </div>
 
+            {{ form_row(form.activity) }}
 
+            {#{% if latest_activity.action != constant('LDuer\\KimaiClockInBundle\\Entity\\LatestActivity::ACTIVITY_STOP') or latest_activity.action == constant('LDuer\\KimaiClockInBundle\\Entity\\LatestActivity::ACTIVITY_PAUSE') %}#}
+            {#{% include '@KimaiClockIn/clock-in/recentActivitiesList.html.twig' %}#}
+            {#{% endif %}#}
+
+            {{ form_row(form.stop) }}
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+    {# {% for row in widget_rows %} #}
+    {#{% embed 'dashboard/section-simple.html.twig' with { section: row } %}{% endembed %}#}
+    {#{% endfor %}#}
 {% endblock %}

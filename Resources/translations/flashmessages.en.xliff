@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file date="2019-01-12T20:00:00Z" source-language="en" target-language="en" datatype="plaintext" original="none">
+        <body>
+            <trans-unit id="timesheet.error">
+                <source>timesheet.error</source>
+                <target>An error occured: %reason%</target>
+            </trans-unit>
+            <trans-unit id="timesheet.stop.success">
+                <source>timesheet.stop.success</source>
+                <target>Time-recording was stopped</target>
+            </trans-unit>
+            <trans-unit id="timesheet.stop.error">
+                <source>timesheet.stop.error</source>
+                <target>Time-recording could not be stopped: %reason%</target>
+            </trans-unit>
+            <trans-unit id="timesheet.start.success">
+                <source>timesheet.start.success</source>
+                <target>Time-recording was started</target>
+            </trans-unit>
+            <trans-unit id="timesheet.start.error">
+                <source>timesheet.start.error</source>
+                <target>Time-recording could not be started: %reason%</target>
+            </trans-unit>
+            <trans-unit id="timesheet.pause.success">
+                <source>timesheet.pause.success</source>
+                <target>Time-recording was paused</target>
+            </trans-unit>
+            <trans-unit id="timesheet.pause.error">
+                <source>timesheet.pause.error</source>
+                <target>Time-recording could not be resumed: %reason%</target>
+            </trans-unit>
+            <trans-unit id="timesheet.resume.success">
+                <source>timesheet.resume.success</source>
+                <target>Time-recording was resumed</target>
+            </trans-unit>
+            <trans-unit id="timesheet.resume.error">
+                <source>timesheet.resume.error</source>
+                <target>Time-recording could not be resumed: %reason%</target>
+            </trans-unit>
+            <trans-unit id="timesheet.start-activity.success">
+                <source>timesheet.start-activity.success</source>
+                <target>Zeitmessung für den Auftrag wurde gestartet</target>
+            </trans-unit>
+            <trans-unit id="timesheet.start-activity.error">
+                <source>timesheet.start-activity.error</source>
+                <target>Zeitmessung für den Auftrag konnte nicht durchgeführt werden: %reason%</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

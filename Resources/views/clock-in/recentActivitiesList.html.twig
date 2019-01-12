@@ -1,0 +1,16 @@
+{% if recent_timesheets|length > 0 %}
+    <h3 class="text-left">
+        {{ 'recent.activities'|transchoice(recent_timesheets|length, [], 'messages') }}
+        <a class="btn btn-primary btn-xs" role="button" data-toggle="collapse" href="#collapseList" aria-expanded="false" aria-controls="collapseList">
+            <i class="fas fa-angle-down"></i>
+        </a>
+    </h3>
+    <div class="list-group list-group-flush text-center collapse" id="collapseList">
+        {% for timesheet in recent_timesheets %}
+            <a href="{{ path('timesheet_start', {'id' : timesheet.id}) }}"
+               class="list-group-item list-group-item-action">
+                <i class="{{ 'start-small'|icon }} text-green"></i> {{ 'recent.activities.format_short'|trans({'%activity%': timesheet.activity.name, '%project%': timesheet.project.name, '%customer%': timesheet.project.customer.name}) }}
+            </a>
+        {% endfor %}
+    </div>
+{% endif %}

@@ -1,3 +1,6 @@
+parameters:
+    clock-in.activity: 0
+
 services:
 
     # default configuration for services in *this* file
@@ -23,3 +26,32 @@ services:
     LDuer\KimaiClockInBundle\Controller\:
         resource: '../../Controller/*'
         tags: ['controller.service_arguments']
+
+#    LDuer\KimaiClockInBundle\Controller\ClockInController:
+#        arguments:
+##            $clockInActivity: "%clock-in.activity%"
+
+    # ================================================================================
+    # THEME/TWIG
+    # ================================================================================
+
+    LDuer\KimaiClockInBundle\Twig\Extensions:
+        arguments:
+            $languages: "%kimai.languages%"
+
+    # ================================================================================
+    # SERVICES
+    # ================================================================================
+
+    LDuer\KimaiClockInBundle\ClockIn\Service:
+        arguments:
+            $clockInActivityId: "%clock-in.activity%"
+
+    # ================================================================================
+    # REPOSITORIES
+    # ================================================================================
+
+    LDuer\KimaiClockInBundle\Repository\LatestActivityRepository:
+        class:     Doctrine\ORM\EntityRepository
+        factory:   ['@doctrine.orm.entity_manager', getRepository]
+        arguments: ['LDuer\KimaiClockInBundle\Entity\LatestActivity']

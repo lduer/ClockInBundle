@@ -18,13 +18,13 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * Homepage controller is a redirect controller with user specific logic.
  *
- * @Route(path="/homepage")
+ * @Route(path="/")
  * @Security("is_granted('ROLE_USER')")
  */
 class HomepageController extends AbstractController
 {
     /**
-     * @Route(path="", defaults={}, name="homepage2", methods={"GET"})
+     * @Route(path="/homepage", defaults={}, name="homepage2", methods={"GET"})
      *
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
@@ -40,5 +40,17 @@ class HomepageController extends AbstractController
         $language = $user->getPreferenceValue('language', $locale);
 
         return $this->redirectToRoute($route, ['_locale' => $language]);
+    }
+
+    /**
+     * @Route(path="/clock-in", defaults={}, name="clock_in_redirect
+     * ", methods={"GET"})
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function clockInAction(Request $request)
+    {
+        return $this->redirectToRoute('clock_in_index');
     }
 }

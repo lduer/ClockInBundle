@@ -1,0 +1,258 @@
+{% extends 'base.html.twig' %}
+{% import "macros/widgets.html.twig" as widgets %}
+{#{% trans_default_domain 'clock-in' %}#}
+{% block page_title %}{{ 'clock_in.title'|trans({}, 'clock-in') }}{% endblock %}
+{% block page_subtitle %}{{ 'clock_in.subtitle'|trans({}, 'clock-in') }}{% endblock %}
+
+{% block page_content_class %}{{ parent() }} Clock-in{% endblock %}
+
+{% block main %}
+
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3 col-sm-12 col-xs-12">
+
+            <div class="" id="project-list">
+                {% include '@KimaiClockIn/clock-in/recentActivitiesList.html.twig' %}
+
+                <div class="divider"></div>
+
+                <h3>{{ 'label.project'|trans }}</h3>
+
+                {{ form_start(search_form) }}
+
+                <div class="form-group">
+                    {{ form_widget(search_form.search) }}
+                </div>
+
+                {{ form_end(search_form) }}
+
+                <div class="panel panel-default loader">
+                    <div class="panel-body text-center">
+                        <i class="fa-4x fas fa-circle-notch fa-spin"></i>
+                    </div>
+                </div>
+                <div class="list-group list-group-flush" id="project-list-group">
+                </div>
+            </div>
+
+
+            <div id="activity-list" style="display: none;">
+                <a href="#" class="btn btn-default" id="back-to-projects"><i
+                            class="fas fa-backward"></i> {{ 'action.back'|trans }}</a>
+                <h3>
+                    {{ 'label.activity'|trans }}
+                    <span id="show-project-name"><small></small></span>
+                </h3>
+                <div class="panel panel-default loader">
+                    <div class="panel-body text-center">
+                        <i class="fa-4x fas fa-circle-notch fa-spin"></i>
+                    </div>
+                </div>
+                <div class="list-group list-group-flush" id="activity-list-group">
+                </div>
+                <div class="text-center" id="submitform">
+                    {{ form_start(clock_in_form) }}
+                    {{ form_row(clock_in_form.project) }}
+                    {{ form_row(clock_in_form.activity) }}
+                    {{ form_row(clock_in_form.submit) }}
+                    {{ form_widget(clock_in_form.description) }}
+                    {{ form_end(clock_in_form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(function () {
+
+            var projectsApiUrl = '{{ url("get_projects", {'visible': 1})|raw }}';
+            var targetDivProjects = $('#project-list-group');
+            var targetDataProject;
+
+            var activitiesApiUrl = '{{ url("get_activities", {'visible': 1})|raw }}';
+            var targetDivActivities = $('#activity-list-group');
+            var targetDataActivities;
+
+            var submitForm = $('#clock_in_form');
+
+            var formSubmitButton = $('#clock_in_form_submit')
+            formSubmitButton.attr('disabled');
+
+            var formProjectField = $('#clock_in_form_project');
+            formProjectField.val('');
+
+            var formActivityField = $('#clock_in_form_activity');
+            formActivityField.val('');
+
+            $.ajax({
+                url: projectsApiUrl,
+                headers: {
+                    'X-AUTH-SESSION': true,
+                    'Content-Type': 'application/json'
+                },
+                method: 'GET',
+                dataType: 'json',
+                success: function (data) {
+
+                    if (data.length === 0) {
+                        targetDivProjects.html('<div class="alert alert-danger">{{ "error.no_entries_found"|trans }}</div>');
+                    }
+                    targetDataProject = data;
+                    return buildProjectList(null);
+                }
+            });
+
+            var buildProjectList = function (search_string) {
+
+                var displayData = targetDataProject;
+
+                var prototypeProjects = '<a href="#" class="list-group-item list-group-item-action project-list" data-project-id="%id%">\n' +
+                    '    <h5 class="list-group-item-heading"><strong>%header%</strong></h5>\n' +
+                    '    <p class="list-group-item-text">%text%</p>\n' +
+                    '</a>';
+
+                if (search_string !== null && search_string !== '') {
+                    // add search: filter targetData to displayData
+                    displayData = $.grep(displayData, function (object, key) {
+                        var regexSearch = new RegExp(search_string, 'i');
+                        var isInName = object.name.search(regexSearch);
+                        var isInCustomerName = object.customer_name.search(regexSearch);
+
+                        return (isInCustomerName !== -1 || isInName !== -1);
+                    });
+                }
+
+                var html_string = '';
+                targetDivProjects.html(html_string);
+                $('.loader').hide();
+
+                $.each(displayData, function (i, v) {
+
+                    html_string = prototypeProjects
+                        .replace('%header%', v.name)
+                        .replace('%text%', v.customer_name)
+                        .replace('%id%', v.id);
+
+                    targetDivProjects.append(html_string);
+                });
+
+                return true;
+            };
+
+            var buildActivityList = function () {
+                var displayData = targetDataActivities;
+                var prototypeActivities = '<a href="#" class="list-group-item list-group-item-action activity-list" data-activity-id="%id%">\n' +
+                    '    <p class="list-group-item-text">%text%</p>\n' +
+                    '</a>';
+
+                var html_string = '';
+                targetDivActivities.html(html_string);
+                $('.loader').hide();
+                $.each(displayData, function (i, v) {
+
+                    html_string = prototypeActivities
+                        .replace('%text%', v.name)
+                        .replace('%id%', v.id);
+
+                    targetDivActivities.append(html_string);
+                });
+
+                return true;
+            };
+
+            var delay = function (callback, ms) {
+                var timer = 0;
+                return function () {
+                    var context = this, args = arguments;
+                    clearTimeout(timer);
+                    timer = setTimeout(function () {
+                        callback.apply(context, args);
+                    }, ms || 0);
+                };
+            };
+
+            $('.search_project_field').keyup(delay(function (e) {
+                return buildProjectList(this.value);
+            }, 500));
+
+            $(document).on("click", ".project-list", function (e) {
+                e.preventDefault();
+
+                var targetDivActivities = $('#activity-list-group');
+
+                // selected project-id != previous (e.g. from "back" button(
+                var project_id = $(this).data('projectId');
+
+                $('#project-list').hide();
+                $('#activity-list').show();
+
+                if (parseInt(project_id) !== parseInt(formProjectField.val())) {
+                    $('.loader').show();
+                    targetDivActivities.html('');
+
+                    formProjectField.val(project_id);
+                    formActivityField.val('');
+                    formSubmitButton.attr('disabled', 'disabled');
+
+                    $('.project-list').each(function () {
+                        $(this).removeClass('active')
+                    });
+                    $(this).addClass('active');
+
+                    $('#show-project-name small').html(
+                        $(this).children('.list-group-item-heading').text() + ' (' + $(this).children('.list-group-item-text').text() + ')'
+                    );
+
+                    $.ajax({
+                        url: activitiesApiUrl + '&project=' + project_id,
+                        headers: {
+                            'X-AUTH-SESSION': true,
+                            'Content-Type': 'application/json'
+                        },
+                        method: 'GET',
+                        dataType: 'json',
+                        success: function (data) {
+
+                            if (data.length === 0) {
+                                targetDivActivities.html('<div class="alert alert-danger">{{ "error.no_entries_found"|trans }}</div>');
+                            }
+                            targetDataActivities = data;
+                            return buildActivityList();
+                        }
+                    });
+
+                }
+                // buildActivityList()
+            });
+
+            $('#back-to-projects').click(function (e) {
+                e.preventDefault();
+                $('#project-list').show();
+                $('#activity-list').hide();
+            });
+
+            $(document).on("click", ".activity-list", function (e) {
+                e.preventDefault();
+                var activity_id = $(this).data('activityId');
+
+                $('.activity-list').each(function () {
+                    $(this).removeClass('active')
+                });
+                $(this).addClass('active');
+
+                // set id to form
+                formActivityField.val(activity_id);
+                formSubmitButton.removeAttr('disabled');
+
+                console.log(submitForm.serialize());
+
+                // $('#project-list').hide();
+                // $('#activity-list').show();
+            });
+        });
+    </script>
+
+{% endblock %}

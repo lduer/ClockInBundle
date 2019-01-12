@@ -11,10 +11,10 @@ namespace LDuer\KimaiClockInBundle\Controller;
 
 use App\Controller\TimesheetController as TimesheetControllerBase;
 use App\Entity\Timesheet;
-use App\Repository\Query\TimesheetQuery;
-use Pagerfanta\Pagerfanta;
+use LDuer\KimaiClockInBundle\ClockIn\Service;
+use LDuer\KimaiClockInBundle\Entity\LatestActivity;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -27,57 +27,25 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class TimesheetController extends TimesheetControllerBase
 {
     /**
-     * @Route(path="/export", name="timesheet_export", methods={"GET"})
-     *
-     * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @var Service
      */
-    public function exportAction(Request $request)
-    {
-        $query = new TimesheetQuery();
-
-        $form = $this->getToolbarForm($query);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            /** @var TimesheetQuery $query */
-            $query = $form->getData();
-            if (null !== $query->getBegin()) {
-                $query->getBegin()->setTime(0, 0, 0);
-            }
-            if (null !== $query->getEnd()) {
-                $query->getEnd()->setTime(23, 59, 59);
-            }
-        }
-
-        $query->setUser($this->getUser());
-
-        /* @var $entries Pagerfanta */
-        $entries = $this->getRepository()->findByQuery($query);
-
-        return $this->render('timesheet/export.html.twig', [
-            'entries' => $entries,
-            'query' => $query,
-        ]);
-    }
+    protected $clockInService;
 
     /**
-     * The "main button and fly-out" for displaying (and stopping) active entries.
+     * TimesheetController constructor.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param Service $clockInService
+     * @param bool $durationOnly
      */
-    public function activeEntriesAction()
+    public function __construct(Service $clockInService, bool $durationOnly)
     {
-        $user = $this->getUser();
-        $activeEntries = $this->getRepository()->getActiveEntries($user);
-
-        return $this->render(
-            'navbar/active-entries.html.twig',
-            ['entries' => $activeEntries]
-        );
+        $this->clockInService = $clockInService;
+        parent::__construct($durationOnly);
     }
 
     /**
      * The route to stop a running entry.
+     *  -- action is here to overwrite kimai-default actions
      *
      * @Route(path="/{id}/stop", name="timesheet_stop", methods={"GET"})
      * @Security("is_granted('stop', entry)")
@@ -87,20 +55,39 @@ class TimesheetController extends TimesheetControllerBase
      */
     public function stopAction(Timesheet $entry)
     {
-        return $this->stop($entry, 'clock_in_index');
+        // ignore entry; stop all entries
+        $response = $this->clockInService->stop($this->getUser());
+        $action = LatestActivity::ACTIVITY_STOP;
+
+        if (is_int($response)) {
+            $reason = ClockInController::$error_msg[$action];
+            $reason = $this->translator->trans($reason, [], 'exceptions');
+            $this->flashError('timesheet.' . $action . '.error', ['%reason%' => $reason]);
+        } else {
+            $this->flashSuccess('timesheet.' . $action . '.success');
+        }
+
+        return $this->redirectToRoute('clock_in_index');
     }
 
     /**
      * The route to re-start a timesheet entry.
+     *  -- action is here to overwrite kimai-default actions
      *
      * @Route(path="/start/{id}", name="timesheet_start", requirements={"id" = "\d+"}, methods={"GET", "POST"})
      * @Security("is_granted('start', timesheet)")
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @param Timesheet $timesheet
+     * @return RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function startAction(ValidatorInterface $validator, Timesheet $timesheet)
     {
-        return parent::startAction($validator, $timesheet);
+        try {
+            $this->clockInService->startTimesheet($timesheet, $this->getUser());
+            $this->flashSuccess('timesheet.start-activity.success');
+        } catch (\Exception $ex) {
+            $this->flashError('timesheet.start-activity.error', ['%reason%' => $ex->getMessage()]);
+        }
 
         return $this->redirectToRoute('clock_in_index');
     }

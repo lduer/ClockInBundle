@@ -2,9 +2,37 @@
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
     <file date="2018-12-26T12:00:00Z" source-language="en" target-language="de" datatype="plaintext" original="clock-in.en.xliff">
         <body>
-            <trans-unit id="clock-in.title">
-                <source>clock-in.title</source>
-                <target>Zeiterfassungs-Buchung</target>
+            <trans-unit id="clock_in.title">
+                <source>clock_in.title</source>
+                <target>Zeiterfassung</target>
+            </trans-unit>
+            <trans-unit id="clock_in.subtitle">
+                <source>clock_in.subtitle</source>
+                <target>Buchung erstellen</target>
+            </trans-unit>
+            <trans-unit id="info.last-booking">
+                <source>info.last-booking</source>
+                <target>Letzte Buchung:</target>
+            </trans-unit>
+            <trans-unit id="info.booked-at">
+                <source>info.booked-at</source>
+                <target>Gebucht am:</target>
+            </trans-unit>
+            <trans-unit id="label.start">
+                <source>label.start</source>
+                <target>Kommen</target>
+            </trans-unit>
+            <trans-unit id="label.stop">
+                <source>label.stop</source>
+                <target>Gehen</target>
+            </trans-unit>
+            <trans-unit id="label.pause">
+                <source>label.pause</source>
+                <target>Pause</target>
+            </trans-unit>
+            <trans-unit id="label.resume">
+                <source>label.resume</source>
+                <target>Weiter ...</target>
             </trans-unit>
         </body>
     </file>
