@@ -18,6 +18,7 @@ class LatestActivityRepository extends AbstractRepository
     /**
      * @param User $user
      * @return LatestActivity[]|null
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function getLatestActivity(User $user)
     {
@@ -25,9 +26,11 @@ class LatestActivityRepository extends AbstractRepository
 
         $qb
             ->where('la.user = :user')
+            ->setMaxResults(1)
+            ->orderBy('la.time', 'DESC')
             ->setParameter(':user', $user);
 
-        $result = $qb->getQuery()->getSingleResult();
+        $result = $qb->getQuery()->getOneOrNullResult();
 
         if (empty($result)) {
             return null;

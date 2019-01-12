@@ -25,13 +25,22 @@ class ClockInButtonForm extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        /** @var LatestActivity $latestActivity */
-        $latestActivity = $options['data'];
+        if (!isset($options['data'])) {
+            $disableStop = true;
+            $disableStart = false;
+            $disablePause = true;
+            $disableResume = true;
 
-        $disableStop = (in_array($latestActivity->getAction(), [LatestActivity::ACTIVITY_STOP, LatestActivity::ACTIVITY_PAUSE]));
-        $disableStart = (in_array($latestActivity->getAction(), [null, LatestActivity::ACTIVITY_RESUME, LatestActivity::ACTIVITY_START]));
-        $disablePause = (in_array($latestActivity->getAction(), [null, LatestActivity::ACTIVITY_RESUME, LatestActivity::ACTIVITY_START]));
-        $disableResume = (in_array($latestActivity->getAction(), [null, LatestActivity::ACTIVITY_RESUME, LatestActivity::ACTIVITY_START, LatestActivity::ACTIVITY_RESUME]));
+        } else {
+
+            /** @var LatestActivity $latestActivity */
+            $latestActivity = $options['data'];
+
+            $disableStop = (in_array($latestActivity->getAction(), [LatestActivity::ACTIVITY_STOP, LatestActivity::ACTIVITY_PAUSE]));
+            $disableStart = (in_array($latestActivity->getAction(), [null, LatestActivity::ACTIVITY_START, LatestActivity::ACTIVITY_RESUME]));
+            $disablePause = (in_array($latestActivity->getAction(), [LatestActivity::ACTIVITY_PAUSE, LatestActivity::ACTIVITY_STOP]));
+            $disableResume = (in_array($latestActivity->getAction(), [null, LatestActivity::ACTIVITY_RESUME, LatestActivity::ACTIVITY_STOP]));
+        }
 
         $builder
             ->add('start', SubmitType::class, [

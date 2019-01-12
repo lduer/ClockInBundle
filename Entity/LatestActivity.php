@@ -93,10 +93,10 @@ class LatestActivity
      * LatestActivity constructor.
      *
      * @param Timesheet $entity
-     * @param string $action
+     * @param null|string $action
      * @param null|User $user
      */
-    public function __construct(Timesheet $entity, string $action, User $user = null)
+    public function __construct(Timesheet $entity, string $action = null, User $user = null)
     {
         $this->setTimesheet($entity);
         $this->setAction($action);

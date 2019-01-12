@@ -225,10 +225,10 @@ class ClockInController extends AbstractController
     }
 
     /**
-     * @param LatestActivity $latestActivity
+     * @param null|LatestActivity $latestActivity
      * @return \Symfony\Component\Form\FormInterface
      */
-    protected function getClockInButtonForm(LatestActivity $latestActivity)
+    protected function getClockInButtonForm(LatestActivity $latestActivity = null)
     {
         return $this->createForm(ClockInButtonForm::class, $latestActivity, [
             'action' => $this->generateUrl('clock_in_index', [
