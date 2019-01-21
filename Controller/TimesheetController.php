@@ -56,7 +56,7 @@ class TimesheetController extends TimesheetControllerBase
     public function stopAction(Timesheet $entry)
     {
         // ignore entry; stop all entries
-        $response = $this->clockInService->stop($this->getUser());
+        $response = $this->clockInService->pause($this->getUser());
         $action = LatestActivity::ACTIVITY_STOP;
 
         if (is_int($response)) {

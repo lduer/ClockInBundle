@@ -107,7 +107,8 @@
 
             var buildProjectList = function (search_string) {
 
-                var displayData = targetDataProject;
+                // show latest projects on top
+                var displayData = targetDataProject.reverse();
 
                 var prototypeProjects = '<a href="#" class="list-group-item list-group-item-action project-list" data-project-id="%id%">\n' +
                     '    <h5 class="list-group-item-heading"><strong>%header%</strong></h5>\n' +
