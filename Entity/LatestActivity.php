@@ -61,7 +61,6 @@ class LatestActivity
      *
      * @ORM\ManyToOne(targetEntity="App\Entity\Timesheet")
      * @ORM\JoinColumn(name="timesheet_id", onDelete="SET NULL", nullable=true)
-     * @Assert\NotNull()
      */
     private $timesheet;
 
