@@ -30,9 +30,7 @@ class ClockInButtonForm extends AbstractType
             $disableStart = false;
             $disablePause = true;
             $disableResume = true;
-
         } else {
-
             /** @var LatestActivity $latestActivity */
             $latestActivity = $options['data'];
 

@@ -41,10 +41,10 @@ class LatestActivity
     ];
 
     public static $icons = [
-          self::ACTIVITY_START => ['name' => 'start-small', 'color' => 'green'],
-          self::ACTIVITY_PAUSE => ['name' => 'pause', 'color' => 'blue'],
-          self::ACTIVITY_RESUME => ['name' => 'repeat', 'color' => 'blue'],
-          self::ACTIVITY_STOP => ['name' => 'stop-small', 'color' => 'red']
+        self::ACTIVITY_START => ['name' => 'start-small', 'color' => 'green'],
+        self::ACTIVITY_PAUSE => ['name' => 'pause', 'color' => 'blue'],
+        self::ACTIVITY_RESUME => ['name' => 'repeat', 'color' => 'blue'],
+        self::ACTIVITY_STOP => ['name' => 'stop-small', 'color' => 'red']
     ];
 
     /**
