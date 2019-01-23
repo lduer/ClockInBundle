@@ -233,7 +233,11 @@ class LatestActivity
      */
     public function getActivityName()
     {
-        $string = $this->timesheet->getActivity()->getName();
+        if (null === $this->getActivity()) {
+            return '';
+        }
+
+        $string = $this->getActivity()->getName();
 
         if (null !== $this->timesheet->getDescription()) {
             $string .= ': ' . $this->timesheet->getDescription();
