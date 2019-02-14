@@ -1,8 +1,18 @@
 lduer/kimai-clock-in
 ======================
 
-<small>clock-in/out additions to Kimai2</small>
+This Bundle provides additional features to the basic Kimai 2 Installation.
 
-This Bundle provides additional features to the basic Kimai2 Installation.
+## Features
 
-Installation: [See Manual](Resources/doc/index.md)
+- Clock in and out with default activity
+- Select project/activity for next/ongoing task with mobile-optimized select-list
+- Catch default timesheet actions from Kimai to notice the new entity `LatestActivity`for any timesheet changes.
+
+## Installation
+
+[See Manual](Resources/doc/index.md)
+
+## Documentation
+
+[WIP]
