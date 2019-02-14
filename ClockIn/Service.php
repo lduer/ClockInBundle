@@ -29,6 +29,11 @@ class Service
     private $objectManager;
 
     /**
+     * @var LatestActivityRepository
+     */
+    private $latestActivityRepository;
+
+    /**
      * @var TimesheetRepository
      */
     private $timesheetRepository;
@@ -76,6 +81,7 @@ class Service
         $this->validator = $validator;
         $this->user = $tokenStorage->getToken()->getUser();
         $this->clockInActivityId = $clockInActivityId;
+        $this->latestActivityRepository = $this->objectManager->getRepository(LatestActivity::class);
     }
 
     /**
@@ -119,12 +125,25 @@ class Service
     {
         $user = $this->getUser($user);
         if (null === $this->latestActivity) {
-            /** @var LatestActivityRepository $repository */
-            $repository = $this->objectManager->getRepository(LatestActivity::class);
-            $this->latestActivity = $repository->getLatestActivity($user);
+            $this->latestActivity = $this->latestActivityRepository->getLatestActivity($user);
         }
 
         return $this->latestActivity;
+    }
+
+    /**
+     * @param User|null $user
+     * @return Timesheet|null
+     */
+    public function findLatestActivityTimesheet(User $user = null)
+    {
+        $user = $this->getUser($user);
+
+        if (null !== $latestActivity = $this->findLatestActivity($user)) {
+            return $latestActivity->getTimesheet();
+        }
+
+        return null;
     }
 
     /**
@@ -201,6 +220,13 @@ class Service
      */
     private function startAction($action, User $user = null)
     {
+        if (!in_array($action, [LatestActivity::ACTIVITY_START, LatestActivity::ACTIVITY_RESUME])) {
+            throw new InvalidArgumentException(sprintf(
+                '(system misconfiguration) Method argument $activity must be one of %s',
+                implode(', ', [LatestActivity::ACTIVITY_START, LatestActivity::ACTIVITY_RESUME])
+            ));
+        }
+
         $user = $this->getUser($user);
 
         // check if no timesheets are started
@@ -212,15 +238,17 @@ class Service
         }
 
         // find latestActivity and use timesheet-informations
-        $latestActivity = $this->findLatestActivity($user);
+        $latestActivityTimesheet = $this->findLatestActivityTimesheet($user);
 
-        if ($action === LatestActivity::ACTIVITY_RESUME) {
-            $entry = clone $latestActivity->getTimesheet();
+        if (null !== $latestActivityTimesheet && $action === LatestActivity::ACTIVITY_RESUME) {
+            $entry = clone $latestActivityTimesheet;
 
             $entry->setUser($this->getUser());
             $entry->setBegin(new \DateTime());
             $entry->setEnd(null);
-        } elseif ($action === LatestActivity::ACTIVITY_START) {
+        }
+
+        if (null === $latestActivityTimesheet || $action === LatestActivity::ACTIVITY_START) {
             // default entry for "start" activity:
             $clockInActivity = $this->getClockInActivity();
 
@@ -230,16 +258,7 @@ class Service
                 ->setUser($user)
                 ->setActivity($clockInActivity);
 
-            if (null === ($project = $clockInActivity->getProject())) {
-                throw new InvalidArgumentException('(system misconfiguration) The default activity for clock-in times does not have a project selected');
-            } else {
-                $entry->setProject($project);
-            }
-        } else {
-            throw new InvalidArgumentException(sprintf(
-                '(system misconfiguration) Method argument $activity must be one of %s',
-                implode(', ', [LatestActivity::ACTIVITY_START, LatestActivity::ACTIVITY_RESUME])
-            ));
+            $entry->setProject($clockInActivity->getProject());
         }
 
 //        $errors = $this->validator->validate($entry);

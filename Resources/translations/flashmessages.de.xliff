@@ -6,22 +6,6 @@
                 <source>timesheet.error</source>
                 <target>Es ist ein Fehler aufgetreten: %reason%</target>
             </trans-unit>
-            <trans-unit id="timesheet.stop.success">
-                <source>timesheet.stop.success</source>
-                <target>Zeitmessung wurde gestoppt</target>
-            </trans-unit>
-            <trans-unit id="timesheet.stop.error">
-                <source>timesheet.stop.error</source>
-                <target>Zeitmessung konnte nicht gestoppt werden: %reason%</target>
-            </trans-unit>
-            <trans-unit id="timesheet.start.success">
-                <source>timesheet.start.success</source>
-                <target>Zeitmessung wurde gestartet</target>
-            </trans-unit>
-            <trans-unit id="timesheet.start.error">
-                <source>timesheet.start.error</source>
-                <target>Zeitmessung konnte nicht gestartet werden: %reason%</target>
-            </trans-unit>
             <trans-unit id="timesheet.pause.success">
                 <source>timesheet.pause.success</source>
                 <target>Zeitmessung wurde pausiert</target>
@@ -45,6 +29,10 @@
             <trans-unit id="timesheet.start-activity.error">
                 <source>timesheet.start-activity.error</source>
                 <target>Zeitmessung für den Auftrag konnte nicht durchgeführt werden: %reason%</target>
+            </trans-unit>
+            <trans-unit id="timesheet.warning.modify-active">
+                <source>timesheet.warning.modify-active</source>
+                <target>Achtung! Sie bearbeiten gerade den Eintrag Ihrer aktuellen Aufzeichnung. Dies kann zu unerwarteten Fehlern führen.</target>
             </trans-unit>
         </body>
     </file>

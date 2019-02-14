@@ -251,6 +251,10 @@ class LatestActivity
      */
     public function getProjectName()
     {
+        if (null === $this->timesheet) {
+            return '';
+        }
+
         return $this->timesheet->getProject()->getName() . ' (' . $this->timesheet->getProject()->getCustomer()->getName() . ')';
     }
 
@@ -271,6 +275,10 @@ class LatestActivity
      */
     public function getProject()
     {
+        if (null === $this->timesheet) {
+            return null;
+        }
+
         return $this->timesheet->getProject();
     }
 }

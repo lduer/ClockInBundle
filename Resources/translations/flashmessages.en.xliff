@@ -6,22 +6,6 @@
                 <source>timesheet.error</source>
                 <target>An error occured: %reason%</target>
             </trans-unit>
-            <trans-unit id="timesheet.stop.success">
-                <source>timesheet.stop.success</source>
-                <target>Time-recording was stopped</target>
-            </trans-unit>
-            <trans-unit id="timesheet.stop.error">
-                <source>timesheet.stop.error</source>
-                <target>Time-recording could not be stopped: %reason%</target>
-            </trans-unit>
-            <trans-unit id="timesheet.start.success">
-                <source>timesheet.start.success</source>
-                <target>Time-recording was started</target>
-            </trans-unit>
-            <trans-unit id="timesheet.start.error">
-                <source>timesheet.start.error</source>
-                <target>Time-recording could not be started: %reason%</target>
-            </trans-unit>
             <trans-unit id="timesheet.pause.success">
                 <source>timesheet.pause.success</source>
                 <target>Time-recording was paused</target>
@@ -40,11 +24,15 @@
             </trans-unit>
             <trans-unit id="timesheet.start-activity.success">
                 <source>timesheet.start-activity.success</source>
-                <target>Zeitmessung für den Auftrag wurde gestartet</target>
+                <target>Time-recording for project started</target>
             </trans-unit>
             <trans-unit id="timesheet.start-activity.error">
                 <source>timesheet.start-activity.error</source>
-                <target>Zeitmessung für den Auftrag konnte nicht durchgeführt werden: %reason%</target>
+                <target>Time-recording for project could not be started: %reason%</target>
+            </trans-unit>
+            <trans-unit id="timesheet.warning.modify-active">
+                <source>timesheet.warning.modify-active</source>
+                <target>Caution! You are modifying the entry of your current timerecording. This could lead to unintended errors.</target>
             </trans-unit>
         </body>
     </file>

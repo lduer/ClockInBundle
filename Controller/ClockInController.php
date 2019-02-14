@@ -80,8 +80,8 @@ class ClockInController extends AbstractController
     }
 
     /**
-     * Route(path="/", defaults={}, name="index_action", methods={"GET"})
      * @Route(path="/", defaults={}, name="index", methods={"GET", "POST"})
+     * @Security("is_granted('create_own_timesheet')")
      */
     public function indexAction(Request $request)
     {
@@ -133,7 +133,7 @@ class ClockInController extends AbstractController
 
     /**
      * @Route(path="/handle/activities", defaults={}, name="handle_activities", methods={"GET", "POST"})
-     *
+     * @Security("is_granted('create_own_timesheet')")
      *
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
@@ -180,6 +180,7 @@ class ClockInController extends AbstractController
 
     /**
      * @Route(path="/handle/{action}", defaults={}, name="handle", methods={"GET"})
+     * @Security("is_granted('create_own_timesheet')")
      *
      * @param string $action
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
