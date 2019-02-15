@@ -32,7 +32,7 @@
             </trans-unit>
             <trans-unit id="timesheet.warning.modify-active">
                 <source>timesheet.warning.modify-active</source>
-                <target>Caution! You are modifying the entry of your current timerecording. This could lead to unintended errors.</target>
+                <target>Caution! You are modifying the entry of a current timerecording. This could lead to unintended errors.</target>
             </trans-unit>
         </body>
     </file>

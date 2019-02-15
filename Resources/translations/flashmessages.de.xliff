@@ -32,7 +32,7 @@
             </trans-unit>
             <trans-unit id="timesheet.warning.modify-active">
                 <source>timesheet.warning.modify-active</source>
-                <target>Achtung! Sie bearbeiten gerade den Eintrag Ihrer aktuellen Aufzeichnung. Dies kann zu unerwarteten Fehlern führen.</target>
+                <target>Achtung! Sie bearbeiten gerade den Eintrag einer aktuellen Aufzeichnung. Dies kann zu unerwarteten Fehlern führen.</target>
             </trans-unit>
         </body>
     </file>
