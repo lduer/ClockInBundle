@@ -104,13 +104,15 @@ class TimesheetController extends TimesheetControllerBase
      */
     public function createAction(Request $request)
     {
-        if ($this->clockInService->findLatestActivity()->getAction() === LatestActivity::ACTIVITY_STOP) {
-            return $this->redirectToRoute('clock_in_handle', ['action' => LatestActivity::ACTIVITY_START]);
-        } elseif ($this->clockInService->findLatestActivity()->getAction() === LatestActivity::ACTIVITY_PAUSE) {
-            return $this->redirectToRoute('clock_in_handle', ['action' => LatestActivity::ACTIVITY_RESUME]);
-        }
-
-        return $this->redirectToRoute('clock_in_index');
+        // todo: is ist required to create a new timesheet? check permissions!
+        return parent::createAction($request);
+//        if ($this->clockInService->findLatestActivity()->getAction() === LatestActivity::ACTIVITY_STOP) {
+//            return $this->redirectToRoute('clock_in_handle', ['action' => LatestActivity::ACTIVITY_START]);
+//        } elseif ($this->clockInService->findLatestActivity()->getAction() === LatestActivity::ACTIVITY_PAUSE) {
+//            return $this->redirectToRoute('clock_in_handle', ['action' => LatestActivity::ACTIVITY_RESUME]);
+//        }
+//
+//        return $this->redirectToRoute('clock_in_index');
     }
 
     /**
