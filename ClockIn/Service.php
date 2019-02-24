@@ -132,6 +132,28 @@ class Service
     }
 
     /**
+     * @param $latestActivity
+     * @return $this
+     */
+    public function updateLatestActivity($latestActivity) {
+        $this->objectManager->persist($latestActivity);
+        $this->objectManager->flush();
+
+        return $this;
+    }
+
+    /**
+     * @param $latestActivity
+     * @return $this
+     */
+    public function removeLatestActivity($latestActivity) {
+        $this->objectManager->remove($latestActivity);
+        $this->objectManager->flush();
+
+        return $this;
+    }
+
+    /**
      * @param User|null $user
      * @return Timesheet|null
      */

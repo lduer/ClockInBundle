@@ -34,6 +34,10 @@
                 <source>timesheet.warning.modify-active</source>
                 <target>Achtung! Sie bearbeiten gerade den Eintrag einer aktuellen Aufzeichnung. Dies kann zu unerwarteten Fehlern führen.</target>
             </trans-unit>
-        </body>
+            <trans-unit id="recent-activity.reset.success">
+                <source>recent-activity.reset.success</source>
+                <target>Ihre Letzte Buchung wurde zurückgesetzt. Ihre aktuelle Zeitaufzeichnung wurde gestoppt.</target>
+            </trans-unit>
+       </body>
     </file>
 </xliff>

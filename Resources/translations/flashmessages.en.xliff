@@ -34,6 +34,10 @@
                 <source>timesheet.warning.modify-active</source>
                 <target>Caution! You are modifying the entry of a current timerecording. This could lead to unintended errors.</target>
             </trans-unit>
+            <trans-unit id="recent-activity.reset.success">
+                <source>recent-activity.reset.success</source>
+                <target>Your last booking was resetted. Your active timerecording was stopped.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

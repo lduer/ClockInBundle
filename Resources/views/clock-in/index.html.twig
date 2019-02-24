@@ -72,6 +72,12 @@
             {{ form_end(form) }}
         </div>
     </div>
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3 col-sm-12 col-xs-12 text-center">
+            <hr style="border-color: black; margin-top:80px;">
+            <a href="{{ path('clock_in_reset_state') }}" class="btn btn-default btn-xs">reset</a>
+        </div>
+    </div>
 
     {# {% for row in widget_rows %} #}
     {#{% embed 'dashboard/section-simple.html.twig' with { section: row } %}{% endembed %}#}

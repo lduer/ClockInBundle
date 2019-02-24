@@ -213,6 +213,30 @@ class ClockInController extends AbstractController
     }
 
     /**
+     * The route to stop a running entry.
+     *  -- action is here to overwrite kimai-default actions
+     *
+     * @Route(path="/reset_state", name="reset_state", methods={"GET"})
+     * @Security("is_granted('create_own_timesheet')")
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function resetStateAction()
+    {
+        $latestActivity = $this->clockInService->findLatestActivity($this->getUser());
+
+        if ($latestActivity !== null) {
+            $this->clockInService->removeLatestActivity($latestActivity);
+        }
+
+        $em = $this->getDoctrine()->getManager();
+
+        $em->getRepository(Timesheet::class)->stopActiveEntries($this->getUser(),1);
+
+        $this->flashSuccess('recent-activity.reset.success');
+        return $this->redirectToRoute('clock_in_index');
+    }
+    /**
      * @param Timesheet $timesheet
      * @return \Symfony\Component\Form\FormInterface
      */
