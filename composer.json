@@ -10,14 +10,25 @@
         }
     ],
     "require": {
-        "php": "^7.1.3"
+        "kimai/kimai2-composer": "*"
     },
     "require-dev": {
-        "kevinpapst/kimai2": "^0.6.1",
+        "kevinpapst/kimai2": "dev-master",
         "friendsofphp/php-cs-fixer": "^2.10",
         "symfony/phpunit-bridge": "^4.2"
     },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "keywords": [
+        "kimai",
+        "kimai-plugin"
+    ],
     "autoload": {
         "psr-4": { "LDuer\\KimaiClockInBundle\\": "" }
+    },
+    "extra": {
+        "kimai": {
+            "name": "ClockInBundle"
+        }
     }
 }

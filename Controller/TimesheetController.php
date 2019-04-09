@@ -9,8 +9,10 @@
 
 namespace LDuer\KimaiClockInBundle\Controller;
 
+use App\Configuration\TimesheetConfiguration;
 use App\Controller\TimesheetController as TimesheetControllerBase;
 use App\Entity\Timesheet;
+use App\Timesheet\UserDateTimeFactory;
 use LDuer\KimaiClockInBundle\ClockIn\Service;
 use LDuer\KimaiClockInBundle\Entity\LatestActivity;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -36,12 +38,13 @@ class TimesheetController extends TimesheetControllerBase
      * TimesheetController constructor.
      *
      * @param Service $clockInService
-     * @param bool $durationOnly
+     * @param UserDateTimeFactory $dateTime
+     * @param TimesheetConfiguration $configuration
      */
-    public function __construct(Service $clockInService, bool $durationOnly)
+    public function __construct(Service $clockInService, UserDateTimeFactory $dateTime, TimesheetConfiguration $configuration)
     {
         $this->clockInService = $clockInService;
-        parent::__construct($durationOnly);
+        parent::__construct($dateTime, $configuration);
     }
 
     /**

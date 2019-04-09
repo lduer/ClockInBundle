@@ -7,10 +7,12 @@
  * file that was distributed with this source code.
  */
 
-namespace LDuer\KimaiClockInBundle\Controller\Admin;
+namespace LDuer\KimaiClockInBundle\Controller;
 
-use App\Controller\Admin\TimesheetController as TimesheetControllerBase;
+use App\Configuration\TimesheetConfiguration;
+use App\Controller\TimesheetTeamController as TimesheetTeamControllerBase;
 use App\Entity\Timesheet;
+use App\Timesheet\UserDateTimeFactory;
 use LDuer\KimaiClockInBundle\ClockIn\Service;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,21 +24,25 @@ use Symfony\Component\Routing\Annotation\Route;
  * @Route(path="/team/timesheet")
  * @Security("is_granted('view_other_timesheet')")
  */
-class TimesheetController extends TimesheetControllerBase
+class TimesheetTeamController extends TimesheetTeamControllerBase
 {
+
     /**
      * @var Service
      */
     protected $clockInService;
 
     /**
-     * TimesheetController constructor.
-     *
+     * TimesheetTeamController constructor.
      * @param Service $clockInService
+     * @param UserDateTimeFactory $dateTime
+     * @param TimesheetConfiguration $configuration
      */
-    public function __construct(Service $clockInService)
+    public function __construct(Service $clockInService, UserDateTimeFactory $dateTime, TimesheetConfiguration $configuration)
     {
         $this->clockInService = $clockInService;
+        $this->dateTime = $dateTime;
+        $this->configuration = $configuration;
     }
 
     /**
