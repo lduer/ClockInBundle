@@ -9,7 +9,6 @@
 
 namespace LDuer\KimaiClockInBundle\EventSubscriber;
 
-//use App\Event\ConfigureAdminMenuEvent;
 use App\Event\ConfigureMainMenuEvent;
 use KevinPapst\AdminLTEBundle\Model\MenuItemModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -19,8 +18,7 @@ class ClockInMenuSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ConfigureMainMenuEvent::CONFIGURE => ['onMainMenuConfigure', 1000],
-//            ConfigureAdminMenuEvent::CONFIGURE => ['onAdminMenuConfigure', 100],
+            ConfigureMainMenuEvent::CONFIGURE => ['onMainMenuConfigure', 200],
         ];
     }
 
@@ -30,11 +28,4 @@ class ClockInMenuSubscriber implements EventSubscriberInterface
             new MenuItemModel('clock-in', 'menu.clock-in', 'clock_in_index', [], 'fas fa-user-clock')
         );
     }
-
-//    public function onAdminMenuConfigure(ConfigureAdminMenuEvent $event)
-//    {
-//        $event->getAdminMenu()->addChild(
-//            new MenuItemModel('timesheet_admin', 'menu.admin_timesheet', 'admin_timesheet', [], 'fa fa-clock-o')
-//        );
-//    }
 }
