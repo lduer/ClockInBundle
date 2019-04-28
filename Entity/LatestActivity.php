@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          @ORM\Index(columns={"user"})
  *     }
  * )
- * @ORM\Table(name="latest_activity")
+ * @ORM\Table(name="kimai2_latest_activity")
  * @ORM\Entity(repositoryClass="LDuer\KimaiClockInBundle\Repository\LatestActivityRepository")
  */
 class LatestActivity
