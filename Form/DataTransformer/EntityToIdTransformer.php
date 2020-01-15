@@ -1,15 +1,15 @@
 <?php
 
 /*
- * This file is part of the Kimai Clock-In bundle.
+ * This file is part of the ClockInBundle for Kimai 2.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace LDuer\KimaiClockInBundle\Form\DataTransformer;
+namespace KimaiPlugin\ClockInBundle\Form\DataTransformer;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
@@ -19,9 +19,9 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 class EntityToIdTransformer implements DataTransformerInterface
 {
     /**
-     * @var ObjectManager
+     * @var RegistryInterface
      */
-    protected $objectManager;
+    protected $registry;
 
     /**
      * @var string
@@ -29,14 +29,14 @@ class EntityToIdTransformer implements DataTransformerInterface
     protected $class;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param ObjectManager $objectManager
-     * @param string $class
+     * @param RegistryInterface $registry
+     * @param $class
      */
-    public function __construct(ObjectManager $objectManager, $class)
+    public function __construct(RegistryInterface $registry, $class)
     {
-        $this->objectManager = $objectManager;
+        $this->registry = $registry;
         $this->class = $class;
     }
 
@@ -61,7 +61,7 @@ class EntityToIdTransformer implements DataTransformerInterface
             return null;
         }
 
-        $entity = $this->objectManager
+        $entity = $this->registry
             ->getRepository($this->class)
             ->find($id);
 

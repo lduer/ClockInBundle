@@ -1,16 +1,16 @@
 <?php
 
 /*
- * This file is part of the Kimai Clock-In bundle.
+ * This file is part of the ClockInBundle for Kimai 2.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace LDuer\KimaiClockInBundle\Form\Type;
+namespace KimaiPlugin\ClockInBundle\Form\Type;
 
-use Doctrine\Common\Persistence\ObjectManager;
-use LDuer\KimaiClockInBundle\Form\DataTransformer\EntityToIdTransformer;
+use KimaiPlugin\ClockInBundle\Form\DataTransformer\EntityToIdTransformer;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -22,18 +22,18 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class HiddenEntityType extends AbstractType
 {
     /**
-     * @var ObjectManager
+     * @var RegistryInterface
      */
-    protected $objectManager;
+    protected $registry;
 
     /**
      * Constructor
      *
-     * @param ObjectManager $objectManager
+     * @param RegistryInterface $registry
      */
-    public function __construct(ObjectManager $objectManager)
+    public function __construct(RegistryInterface $registry)
     {
-        $this->objectManager = $objectManager;
+        $this->registry = $registry;
     }
 
     /**
@@ -42,7 +42,7 @@ class HiddenEntityType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $transformer = new EntityToIdTransformer($this->objectManager, $options['class']);
+        $transformer = new EntityToIdTransformer($this->registry, $options['class']);
         $builder->addModelTransformer($transformer);
     }
 

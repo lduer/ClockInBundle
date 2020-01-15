@@ -1,27 +1,25 @@
 <?php
 
 /*
- * This file is part of the Kimai Clock-In bundle.
+ * This file is part of the ClockInBundle for Kimai 2.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace LDuer\KimaiClockInBundle\Controller;
+namespace KimaiPlugin\ClockInBundle\Controller;
 
 use App\Controller\AbstractController;
-use App\Entity\Activity;
 use App\Entity\Timesheet;
 use App\Model\DashboardSection;
 use App\Model\Widget;
-use App\Repository\ActivityRepository;
 use App\Repository\TimesheetRepository;
 use App\Repository\WidgetRepository;
 use http\Exception\InvalidArgumentException;
-use LDuer\KimaiClockInBundle\ClockIn\Service;
-use LDuer\KimaiClockInBundle\Entity\LatestActivity;
-use LDuer\KimaiClockInBundle\Form\ClockInButtonForm;
-use LDuer\KimaiClockInBundle\Form\ClockInForm;
+use KimaiPlugin\ClockInBundle\ClockIn\Service;
+use KimaiPlugin\ClockInBundle\Entity\LatestActivity;
+use KimaiPlugin\ClockInBundle\Form\ClockInButtonForm;
+use KimaiPlugin\ClockInBundle\Form\ClockInForm;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,12 +27,10 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-//use Symfony\Contracts\Translation\TranslatorInterface;
-
 /**
  * Dashboard controller for the admin area.
  *
- * @Route(path="/")
+ * @Route(path="/clock-in", name="clock_in_")
  * @Security("is_granted('ROLE_USER')")
  */
 class ClockInController extends AbstractController
@@ -85,7 +81,7 @@ class ClockInController extends AbstractController
      */
     public function indexAction(Request $request)
     {
-        $latestActivity = $this->clockInService->findLatestActivity();
+        $latestActivity = $this->clockInService->findLatestActivity($this->getUser());
 
         $form = $this->getClockInButtonForm($latestActivity);
 
@@ -103,32 +99,11 @@ class ClockInController extends AbstractController
             }
         }
 
-        $recentTimesheets = $this->getRecentActivities();
-
-        return $this->render('@KimaiClockIn/clock-in/index.html.twig', [
+        return $this->render('@ClockIn/clock-in/index.html.twig', [
             'form' => $form->createView(),
             'latest_activity' => $latestActivity,
-            'recent_timesheets' => $recentTimesheets,
             'clock_in_activity_id' => $this->clockInService->getClockInActivityId()
         ]);
-    }
-
-    /**
-     * @return \App\Entity\Timesheet[]
-     */
-    private function getRecentActivities()
-    {
-        $user = $this->getUser();
-
-        try {
-            /** @var ActivityRepository $repository */
-            $repository = $this->getDoctrine()->getRepository(Activity::class);
-            $entries = $repository->getRecentActivities($user, new \DateTime('-50 days'), 5);
-        } catch (\Exception $ex) {
-            $entries = [];
-        }
-
-        return $entries;
     }
 
     /**
@@ -142,7 +117,6 @@ class ClockInController extends AbstractController
     public function handleActivitiesAction(Request $request)
     {
         $timesheet = new Timesheet();
-        $recentTimesheets = $this->getRecentActivities();
 
         $searchForm = $this->getSearchFieldForm();
         $clockInForm = $this->getClockInForm($timesheet);
@@ -171,8 +145,7 @@ class ClockInController extends AbstractController
             return $this->redirectToRoute($route);
         }
 
-        return $this->render('@KimaiClockIn/clock-in/handle_activities.html.twig', [
-            'recent_timesheets' => $recentTimesheets,
+        return $this->render('@ClockIn/clock-in/handle_activities.html.twig', [
             'clock_in_form' => $clockInForm->createView(),
             'search_form' => $searchForm->createView()
         ]);
@@ -213,8 +186,7 @@ class ClockInController extends AbstractController
     }
 
     /**
-     * The route to stop a running entry.
-     *  -- action is here to overwrite kimai-default actions
+     * The route to stop all running entries from user and reset the latestActivity State
      *
      * @Route(path="/reset_state", name="reset_state", methods={"GET"})
      * @Security("is_granted('create_own_timesheet')")
@@ -231,11 +203,13 @@ class ClockInController extends AbstractController
 
         $em = $this->getDoctrine()->getManager();
 
-        $em->getRepository(Timesheet::class)->stopActiveEntries($this->getUser(),1);
+        $em->getRepository(Timesheet::class)->stopActiveEntries($this->getUser(), 1);
 
         $this->flashSuccess('recent-activity.reset.success');
+
         return $this->redirectToRoute('clock_in_index');
     }
+
     /**
      * @param Timesheet $timesheet
      * @return \Symfony\Component\Form\FormInterface
@@ -270,7 +244,7 @@ class ClockInController extends AbstractController
         return $this->createFormBuilder()
             ->add('search', TextType::class, [
                 'attr' => [
-                    'placeholder' => 'search',
+                    'placeholder' => 'search-projects-customers',
                     'class' => 'search_project_field'
                 ]
             ])->getForm();

@@ -18,16 +18,16 @@
                             <div class="clock-in-info">
 
                                 {% if latest_activity.icon is not empty %}
-                                    <i class="{{ latest_activity.icon.name|icon }} text-{{ latest_activity.icon.color }}"></i>
+                                    <i class="{{ latest_activity.icon.class }} text-{{ latest_activity.icon.color }}"></i>
                                 {% endif %}
 
-                                {% if clock_in_activity_id != latest_activity.activityId and latest_activity.action == constant('LDuer\\KimaiClockInBundle\\Entity\\LatestActivity::ACTIVITY_PAUSE') %}
+                                {% if clock_in_activity_id != latest_activity.activityId and latest_activity.action == constant('KimaiPlugin\\ClockInBundle\\Entity\\LatestActivity::ACTIVITY_PAUSE') %}
                                     {#pause text + project#}
                                     ({{ ('label.'~latest_activity.action)|trans }}) <span
                                         class="text-secondary text-muted">{{ latest_activity.activityName }}</span>
                                     <div class="text-secondary text-muted">{{ latest_activity.projectName }}</div>
 
-                                {% elseif clock_in_activity_id != latest_activity.activityId and latest_activity.action == constant('LDuer\\KimaiClockInBundle\\Entity\\LatestActivity::ACTIVITY_RESUME') %}
+                                {% elseif clock_in_activity_id != latest_activity.activityId and latest_activity.action == constant('KimaiPlugin\\ClockInBundle\\Entity\\LatestActivity::ACTIVITY_RESUME') %}
 
                                     {#resume: text + project#}
                                     <span class="text-secondary text-muted">({{ ('label.'~latest_activity.action)|trans }})</span> {{ latest_activity.activityName }}
@@ -64,10 +64,6 @@
 
             {{ form_row(form.activity) }}
 
-            {#{% if latest_activity.action != constant('LDuer\\KimaiClockInBundle\\Entity\\LatestActivity::ACTIVITY_STOP') or latest_activity.action == constant('LDuer\\KimaiClockInBundle\\Entity\\LatestActivity::ACTIVITY_PAUSE') %}#}
-            {#{% include '@KimaiClockIn/clock-in/recentActivitiesList.html.twig' %}#}
-            {#{% endif %}#}
-
             {{ form_row(form.stop) }}
             {{ form_end(form) }}
         </div>
@@ -78,8 +74,14 @@
             <a href="{{ path('clock_in_reset_state') }}" class="btn btn-default btn-xs">reset</a>
         </div>
     </div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('kimai.timesheetUpdate', function() {
+            var datatable = kimai.getPlugin('datatable');
 
-    {# {% for row in widget_rows %} #}
-    {#{% embed 'dashboard/section-simple.html.twig' with { section: row } %}{% endembed %}#}
-    {#{% endfor %}#}
+            datatable.reloadDatatable();
+        });
+    </script>
 {% endblock %}

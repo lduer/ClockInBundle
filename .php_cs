@@ -1,6 +1,6 @@
 <?php
 $fileHeaderComment = <<<COMMENT
-This file is part of the Kimai Clock-In bundle.
+This file is part of the ClockInBundle for Kimai 2.
 
 For the full copyright and license information, please view the LICENSE
 file that was distributed with this source code.
@@ -144,13 +144,9 @@ return PhpCsFixer\Config::create()
         PhpCsFixer\Finder::create()
             ->in([
                 __DIR__
-            ])
-            ->name('*.php')
-            ->exclude([
-                __DIR__ . '/.github',
-                __DIR__ . '/node_modules',
-                __DIR__ . '/Resources',
-                __DIR__ . '/vendor',
+            ])->exclude([
+                __DIR__ . '/Resources/',
+                __DIR__ . '/vendor/',
             ])
     )
     ->setFormat('checkstyle')

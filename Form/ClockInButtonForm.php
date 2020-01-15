@@ -1,15 +1,15 @@
 <?php
 
 /*
- * This file is part of the Kimai Clock-In bundle.
+ * This file is part of the ClockInBundle for Kimai 2.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace LDuer\KimaiClockInBundle\Form;
+namespace KimaiPlugin\ClockInBundle\Form;
 
-use LDuer\KimaiClockInBundle\Entity\LatestActivity;
+use KimaiPlugin\ClockInBundle\Entity\LatestActivity;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;

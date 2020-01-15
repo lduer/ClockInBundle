@@ -1,24 +1,24 @@
 <?php
 
 /*
- * This file is part of the Kimai Clock-In bundle.
+ * This file is part of the ClockInBundle for Kimai 2.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace LDuer\KimaiClockInBundle\EventSubscriber;
+namespace KimaiPlugin\ClockInBundle\EventSubscriber;
 
 use App\Event\ConfigureMainMenuEvent;
 use KevinPapst\AdminLTEBundle\Model\MenuItemModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ClockInMenuSubscriber implements EventSubscriberInterface
+class MenuSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {
         return [
-            ConfigureMainMenuEvent::CONFIGURE => ['onMainMenuConfigure', 200],
+            ConfigureMainMenuEvent::class => ['onMainMenuConfigure', 200],
         ];
     }
 

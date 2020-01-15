@@ -12,38 +12,35 @@ services:
         # The best practice is to be explicit about your dependencies anyway.
 
         bind:
-#            $projectDirectory: "%kernel.project_dir%"
-#            $hardLimit: "%kimai.timesheet.active_entries.hard_limit%"
+                $clockInActivityId: "%clock-in.activity%"
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
-    LDuer\KimaiClockInBundle\:
+    KimaiPlugin\ClockInBundle\:
         resource: '../../*'
         exclude: '../../{DependencyInjection,Entity,Migrations,Tests}'
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
-    LDuer\KimaiClockInBundle\Controller\:
+    KimaiPlugin\ClockInBundle\Controller\:
         resource: '../../Controller/*'
         tags: ['controller.service_arguments']
-
-#    LDuer\KimaiClockInBundle\Controller\ClockInController:
-#        arguments:
-##            $clockInActivity: "%clock-in.activity%"
 
     # ================================================================================
     # SERVICES
     # ================================================================================
 
-    LDuer\KimaiClockInBundle\ClockIn\Service:
-        arguments:
-            $clockInActivityId: "%clock-in.activity%"
+    clock_in_service:
+        class: KimaiPlugin\ClockInBundle\ClockIn\Service
+#        arguments:
+#            $clockInActivityId: "%clock-in.activity%"
+
 
     # ================================================================================
     # REPOSITORIES
     # ================================================================================
 
-    LDuer\KimaiClockInBundle\Repository\LatestActivityRepository:
+    KimaiPlugin\ClockInBundle\Repository\LatestActivityRepository:
         class:     Doctrine\ORM\EntityRepository
         factory:   ['@doctrine.orm.entity_manager', getRepository]
-        arguments: ['LDuer\KimaiClockInBundle\Entity\LatestActivity']
+        arguments: ['KimaiPlugin\ClockInBundle\Entity\LatestActivity']

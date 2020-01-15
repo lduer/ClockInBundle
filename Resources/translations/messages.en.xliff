@@ -6,6 +6,10 @@
                 <source>search</source>
                 <target>Suche</target>
             </trans-unit>
+            <trans-unit id="search-projects-customers">
+                <source>search-projects-customers</source>
+                <target>Search in Projects and Customers</target>
+            </trans-unit>
             <!--
               Menu / Navbar items
             -->

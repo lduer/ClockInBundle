@@ -1,7 +1,16 @@
 {
-    "name": "lduer/kimai-clock-in-bundle",
-    "type": "symfony-bundle",
-    "description": "clock-in/out features for kimai2",
+    "name": "lduer/clock-in-bundle",
+    "description": "This Kimai 2 plugin provides additional features for a simpler ClockIn usage on mobile screens.",
+    "homepage": "https://github.com/lduer/ClockInBundle",
+    "type": "kimai-plugin",
+    "version": "0.2",
+    "require": {
+        "kimai/kimai2-composer": "*"
+    },
+    "keywords": [
+        "kimai",
+        "kimai-plugin"
+    ],
     "license": "MIT",
     "authors": [
         {
@@ -9,26 +18,18 @@
             "email": "duerlukas@gmail.com"
         }
     ],
-    "require": {
-        "kimai/kimai2-composer": "*"
-    },
-    "require-dev": {
-        "kevinpapst/kimai2": "dev-master",
-        "friendsofphp/php-cs-fixer": "^2.10",
-        "symfony/phpunit-bridge": "^4.2"
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-    "keywords": [
-        "kimai",
-        "kimai-plugin"
-    ],
-    "autoload": {
-        "psr-4": { "LDuer\\KimaiClockInBundle\\": "" }
-    },
     "extra": {
         "kimai": {
+            "require": "1.6",
+            "version": "0.2",
             "name": "ClockInBundle"
         }
+    },
+    "scripts": {
+        "codestyle": "vendor/bin/php-cs-fixer fix --dry-run --verbose --show-progress=none",
+        "codestyle-fix": "vendor/bin/php-cs-fixer fix"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.16"
     }
 }

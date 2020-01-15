@@ -1,13 +1,13 @@
 <?php
 
 /*
- * This file is part of the Kimai Clock-In bundle.
+ * This file is part of the ClockInBundle for Kimai 2.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace LDuer\KimaiClockInBundle\Entity;
+namespace KimaiPlugin\ClockInBundle\Entity;
 
 use App\Entity\Timesheet;
 use App\Entity\User;
@@ -23,8 +23,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          @ORM\Index(columns={"user"})
  *     }
  * )
- * @ORM\Table(name="kimai2_latest_activity")
- * @ORM\Entity(repositoryClass="LDuer\KimaiClockInBundle\Repository\LatestActivityRepository")
+ * @ORM\Table(name="latest_activity")
+ * @ORM\Entity(repositoryClass="KimaiPlugin\ClockInBundle\Repository\LatestActivityRepository")
  */
 class LatestActivity
 {
@@ -41,10 +41,10 @@ class LatestActivity
     ];
 
     public static $icons = [
-        self::ACTIVITY_START => ['name' => 'start-small', 'color' => 'green'],
-        self::ACTIVITY_PAUSE => ['name' => 'pause', 'color' => 'blue'],
-        self::ACTIVITY_RESUME => ['name' => 'repeat', 'color' => 'blue'],
-        self::ACTIVITY_STOP => ['name' => 'stop-small', 'color' => 'red']
+        self::ACTIVITY_START => ['class' => 'far fa-play-circle', 'color' => 'green'],
+        self::ACTIVITY_PAUSE => ['class' => 'fas fa-pause text-blue', 'color' => 'blue'],
+        self::ACTIVITY_RESUME => ['class' => 'fas fa-redo-alt', 'color' => 'blue'],
+        self::ACTIVITY_STOP => ['class' => 'far fa-stop-circle', 'color' => 'red']
     ];
 
     /**
@@ -123,12 +123,16 @@ class LatestActivity
     }
 
     /**
-     * @param Timesheet $timesheet
+     * @param null|Timesheet $timesheet
      * @return LatestActivity
      */
-    public function setTimesheet(Timesheet $timesheet)
+    public function setTimesheet(Timesheet $timesheet = null)
     {
         $this->timesheet = $timesheet;
+
+        if (null === $timesheet) {
+            return $this;
+        }
 
         if (null === $this->timesheet->getEnd()) {
             $this->time = $this->timesheet->getBegin();

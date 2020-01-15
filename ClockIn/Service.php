@@ -1,22 +1,22 @@
 <?php
 
 /*
- * This file is part of the Kimai Clock-In bundle.
+ * This file is part of the ClockInBundle for Kimai 2.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace LDuer\KimaiClockInBundle\ClockIn;
+namespace KimaiPlugin\ClockInBundle\ClockIn;
 
 use App\Entity\Activity;
 use App\Entity\Timesheet;
 use App\Entity\User;
+use App\Repository\ActivityRepository;
 use App\Repository\TimesheetRepository;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\EntityManagerInterface;
-use LDuer\KimaiClockInBundle\Entity\LatestActivity;
-use LDuer\KimaiClockInBundle\Repository\LatestActivityRepository;
+//use Doctrine\Persistence\ObjectManager;
+use KimaiPlugin\ClockInBundle\Entity\LatestActivity;
+use KimaiPlugin\ClockInBundle\Repository\LatestActivityRepository;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -24,19 +24,19 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class Service
 {
     /**
-     * @var ObjectManager
+     * @var TimesheetRepository
      */
-    private $objectManager;
+    private $timesheetRepository;
+
+    /**
+     * @var ActivityRepository
+     */
+    private $activityRepository;
 
     /**
      * @var LatestActivityRepository
      */
     private $latestActivityRepository;
-
-    /**
-     * @var TimesheetRepository
-     */
-    private $timesheetRepository;
 
     /**
      * @var ValidatorInterface
@@ -66,31 +66,44 @@ class Service
     /**
      * Service constructor.
      *
-     * TODO create exception class ClockInException and handle it in controller (instead of int-values) - translate error messages for frontend
-     *
-     * @param ObjectManager $objectManager
      * @param TimesheetRepository $timesheetRepository
+     * @param ActivityRepository $activityRepository
+     * @param LatestActivityRepository $latestActivityRepository
      * @param ValidatorInterface $validator
      * @param TokenStorageInterface $tokenStorage
      * @param int $clockInActivityId
      */
-    public function __construct(ObjectManager $objectManager, TimesheetRepository $timesheetRepository, ValidatorInterface $validator, TokenStorageInterface $tokenStorage, int $clockInActivityId)
+    public function __construct(TimesheetRepository $timesheetRepository, ActivityRepository $activityRepository, LatestActivityRepository $latestActivityRepository, ValidatorInterface $validator, TokenStorageInterface $tokenStorage, int $clockInActivityId)
     {
-        $this->objectManager = $objectManager;
         $this->timesheetRepository = $timesheetRepository;
+        $this->activityRepository = $activityRepository;
+        $this->latestActivityRepository = $latestActivityRepository; //$this->objectManager->getRepository(LatestActivity::class);
         $this->validator = $validator;
-        $this->user = $tokenStorage->getToken()->getUser();
         $this->clockInActivityId = $clockInActivityId;
-        $this->latestActivityRepository = $this->objectManager->getRepository(LatestActivity::class);
+
+        $this->setTokenStorage($tokenStorage);
     }
 
     /**
-     * @return Activity|null
+     * @param TokenStorageInterface $tokenStorage
+     */
+    public function setTokenStorage(TokenStorageInterface $tokenStorage)
+    {
+        if (null !== $tokenStorage->getToken()) {
+            $this->user = $tokenStorage->getToken()->getUser();
+        }
+    }
+
+    /**
+     * @return Activity|object|null
+     * @throws ClockInException
      */
     private function getClockInActivity()
     {
-        if (null === $this->clockInActivity) {
-            $this->clockInActivity = $this->objectManager->getRepository(Activity::class)->find($this->clockInActivityId);
+        $this->clockInActivity = $this->activityRepository->find($this->clockInActivityId);
+
+        if (null === $this->clockInActivity || 0 === $this->clockInActivityId) {
+            throw new ClockInException(sprintf('The default clock in activity is not found. Did you configure it via parameter "%s"', 'clock-in.activity'));
         }
 
         return $this->clockInActivity;
@@ -119,7 +132,7 @@ class Service
 
     /**
      * @param User|null $user
-     * @return LatestActivity|LatestActivity[]|null
+     * @return LatestActivity|null
      */
     public function findLatestActivity(User $user = null)
     {
@@ -132,12 +145,14 @@ class Service
     }
 
     /**
-     * @param $latestActivity
+     * @param LatestActivity $latestActivity
      * @return $this
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function updateLatestActivity($latestActivity) {
-        $this->objectManager->persist($latestActivity);
-        $this->objectManager->flush();
+    public function updateLatestActivity(LatestActivity $latestActivity)
+    {
+        $this->latestActivityRepository->updateLatestActivity($latestActivity);
 
         return $this;
     }
@@ -145,10 +160,12 @@ class Service
     /**
      * @param $latestActivity
      * @return $this
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function removeLatestActivity($latestActivity) {
-        $this->objectManager->remove($latestActivity);
-        $this->objectManager->flush();
+    public function removeLatestActivity($latestActivity)
+    {
+        $this->latestActivityRepository->updateLatestActivity($latestActivity);
 
         return $this;
     }
@@ -172,26 +189,26 @@ class Service
      * @param User $user
      * @param Timesheet $timesheet
      * @param null $action
-     * @return LatestActivity|LatestActivity[]|null
+     * @return LatestActivity|null
+     * @throws \Doctrine\ORM\ORMException
      */
-    protected function manageLatestActivity(User $user, Timesheet $timesheet, $action = null)
+    public function manageLatestActivity(User $user, Timesheet $timesheet, $action = null)
     {
         $latestActivity = $this->findLatestActivity($user);
 
         if (null === $latestActivity) {
             $latestActivity = new LatestActivity($timesheet, $action, $user);
 
-            $this->objectManager->persist($latestActivity);
-        } else {
             $latestActivity
                 ->setAction($action)
                 ->setTimesheet($timesheet);
         }
 
-        // set $action to latest activity
         $latestActivity
             ->setTimesheet($timesheet)
             ->setAction($action);
+
+        $this->latestActivityRepository->save($latestActivity);
 
         return $latestActivity;
     }
@@ -199,7 +216,7 @@ class Service
     /**
      * @param User|null $user
      * @return Timesheet|int
-     * @throws \Exception
+     * @throws ClockInException
      */
     public function start(User $user = null)
     {
@@ -209,7 +226,7 @@ class Service
     /**
      * @param User|null $user
      * @return Timesheet|int
-     * @throws \Exception
+     * @throws ClockInException
      */
     public function resume(User $user = null)
     {
@@ -237,8 +254,8 @@ class Service
     /**
      * @param $action
      * @param User|null $user
-     * @return Timesheet|int
-     * @throws \Exception
+     * @return Timesheet|null
+     * @throws ClockInException
      */
     private function startAction($action, User $user = null)
     {
@@ -250,13 +267,11 @@ class Service
         }
 
         $user = $this->getUser($user);
-
-        // check if no timesheets are started
         $activeEntries = $this->timesheetRepository->getActiveEntries($user);
 
         if (($activeEntriesCount = count($activeEntries)) !== 0) {
-            // break action and return number of active entries
-            return $activeEntriesCount;
+//            TODO
+            throw new ClockInException('More than 0 started activities');
         }
 
         // find latestActivity and use timesheet-informations
@@ -283,15 +298,9 @@ class Service
             $entry->setProject($clockInActivity->getProject());
         }
 
-//        $errors = $this->validator->validate($entry);
-//        if (count($errors) > 0) {
-//        throw new InvalidArgumentException($errors[0]->getPropertyPath() . ' = ' . $errors[0]->getMessage());
-
-        /* @var EntityManagerInterface $entityManager */
-        $this->objectManager->persist($entry);
+        $this->timesheetRepository->save($entry);
 
         $this->manageLatestActivity($user, $entry, $action);
-        $this->objectManager->flush();
 
         return $entry;
     }
@@ -311,24 +320,22 @@ class Service
 
         if (count($activeEntries) === 0) {
             // all entries are already stopped
-            return 0;
+            return null;
         }
 
         // fallback, if more than one records are active
-        // use latest of all entries for $latestActivity
+        // use latest of all entries for managing the latest activity
         $timesheet = null;
         $activeEntries = array_reverse($activeEntries);
         foreach ($activeEntries as $currentEntry) {
             $timesheet = $currentEntry;
-            $this->objectManager->getRepository(Timesheet::class)->stopRecording($currentEntry);
+            $this->timesheetRepository->stopRecording($currentEntry);
         }
 
         // when called from inside other method, this doesn't need to be called
         if ($manageLatestActivity) {
             $this->manageLatestActivity($user, $timesheet, $action);
         }
-
-        $this->objectManager->flush();
 
         return $timesheet;
     }
@@ -351,10 +358,10 @@ class Service
         $entry->setBegin(new \DateTime());
         $entry->setEnd(null);
 
-        $this->objectManager->persist($entry);
+        // is this needed? create action should be done in other functions
+        $this->timesheetRepository->save($entry);
 
         $this->manageLatestActivity($user, $entry);
-        $this->objectManager->flush();
 
         return $entry;
     }

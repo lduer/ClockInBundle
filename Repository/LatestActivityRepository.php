@@ -1,23 +1,23 @@
 <?php
 
 /*
- * This file is part of the Kimai Clock-In bundle.
+ * This file is part of the ClockInBundle for Kimai 2.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace LDuer\KimaiClockInBundle\Repository;
+namespace KimaiPlugin\ClockInBundle\Repository;
 
 use App\Entity\User;
-use App\Repository\AbstractRepository;
-use LDuer\KimaiClockInBundle\Entity\LatestActivity;
+use Doctrine\ORM\EntityRepository;
+use KimaiPlugin\ClockInBundle\Entity\LatestActivity;
 
-class LatestActivityRepository extends AbstractRepository
+class LatestActivityRepository extends EntityRepository
 {
     /**
      * @param User $user
-     * @return LatestActivity[]|null
+     * @return mixed|null
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function getLatestActivity(User $user)
@@ -37,5 +37,41 @@ class LatestActivityRepository extends AbstractRepository
         }
 
         return $result;
+    }
+
+    /**
+     * @param LatestActivity $timesheet
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function save(LatestActivity $timesheet)
+    {
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($timesheet);
+        $entityManager->flush();
+    }
+
+    /**
+     * @param LatestActivity $latestActivity
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function updateLatestActivity(LatestActivity $latestActivity)
+    {
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($latestActivity);
+        $entityManager->flush();
+    }
+
+    /**
+     * @param $latestActivity
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function removeLatestActivity($latestActivity)
+    {
+        $entityManager = $this->getEntityManager();
+        $entityManager->remove($latestActivity);
+        $entityManager->flush();
     }
 }
