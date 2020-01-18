@@ -18,12 +18,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * LatestActivity
  * @ORM\Table(
- *     name="latest_activity",
+ *     name="kimai2_latest_activity",
  *     indexes={
  *          @ORM\Index(columns={"user"})
  *     }
  * )
- * @ORM\Table(name="latest_activity")
+ * @ORM\Table(name="kimai2_latest_activity")
  * @ORM\Entity(repositoryClass="KimaiPlugin\ClockInBundle\Repository\LatestActivityRepository")
  */
 class LatestActivity
