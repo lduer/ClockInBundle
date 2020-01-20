@@ -12,7 +12,7 @@ namespace KimaiPlugin\ClockInBundle\Form;
 use App\Entity\Activity;
 use App\Entity\Project;
 use App\Entity\Timesheet;
-use KimaiPlugin\ClockInBundle\Form\Type\WeeklyHoursType;
+use KimaiPlugin\ClockInBundle\Form\Type\HiddenEntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -30,11 +30,11 @@ class ClockInForm extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('project', WeeklyHoursType::class, [
+            ->add('project', HiddenEntityType::class, [
                 'class' => Project::class,
                 'label' => 'label.project',
             ])
-            ->add('activity', WeeklyHoursType::class, [
+            ->add('activity', HiddenEntityType::class, [
                 'class' => Activity::class
             ])
             ->add('description', TextareaType::class, [
