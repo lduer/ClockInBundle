@@ -11,10 +11,7 @@ namespace KimaiPlugin\ClockInBundle\Controller;
 
 use App\Controller\AbstractController;
 use App\Entity\Timesheet;
-use App\Model\DashboardSection;
-use App\Model\Widget;
 use App\Repository\TimesheetRepository;
-use App\Repository\WidgetRepository;
 use http\Exception\InvalidArgumentException;
 use KimaiPlugin\ClockInBundle\ClockIn\Service;
 use KimaiPlugin\ClockInBundle\Entity\LatestActivity;
@@ -41,11 +38,6 @@ class ClockInController extends AbstractController
         LatestActivity::ACTIVITY_STOP => 'timesheet.all-stopped',
         LatestActivity::ACTIVITY_PAUSE => 'timesheet.all-stopped',
     ];
-
-    /**
-     * @var WidgetRepository
-     */
-    protected $repository;
 
     /**
      * @var ValidatorInterface
@@ -192,6 +184,8 @@ class ClockInController extends AbstractController
      * @Security("is_granted('create_own_timesheet')")
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function resetStateAction()
     {
@@ -248,42 +242,5 @@ class ClockInController extends AbstractController
                     'class' => 'search_project_field'
                 ]
             ])->getForm();
-    }
-
-    /**
-     * @return array
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     */
-    protected function getDurationWeekWidget()
-    {
-        $widget = [
-            'title' => 'stats.durationWeek',
-            'query' => 'duration',
-            'user' => true,
-            'begin' => new \DateTime('monday this week 00:00:00'),
-            'end' => new \DateTime('sunday this week 00:00:00'),
-            'icon' => 'duration',
-            'color' => 'blue'
-        ];
-
-        $data = $this->repository->getStatistic($widget['query'], $widget['begin'], $widget['end'], $this->getUser());
-
-        $row = new DashboardSection(null);
-
-        $model = new Widget($widget['title'], $data);
-        $model
-            ->setColor($widget['color'])
-            ->setIcon($widget['icon'])
-            ->setType(Widget::TYPE_COUNTER);
-
-        $row->addWidget($model);
-
-        if ($widget['query'] == TimesheetRepository::STATS_QUERY_DURATION) {
-            $model->setDataType(Widget::DATA_TYPE_DURATION);
-        } elseif ($widget['query'] == TimesheetRepository::STATS_QUERY_RATE) {
-            $model->setDataType(Widget::DATA_TYPE_MONEY);
-        }
-
-        return [$row];
     }
 }
