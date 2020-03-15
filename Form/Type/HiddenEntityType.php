@@ -10,7 +10,7 @@
 namespace KimaiPlugin\ClockInBundle\Form\Type;
 
 use KimaiPlugin\ClockInBundle\Form\DataTransformer\EntityToIdTransformer;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -22,16 +22,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class HiddenEntityType extends AbstractType
 {
     /**
-     * @var RegistryInterface
+     * @var ManagerRegistry
      */
     protected $registry;
 
     /**
      * Constructor
      *
-     * @param RegistryInterface $registry
+     * @param ManagerRegistry $registry
      */
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
     }
