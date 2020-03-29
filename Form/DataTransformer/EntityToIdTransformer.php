@@ -9,7 +9,7 @@
 
 namespace KimaiPlugin\ClockInBundle\Form\DataTransformer;
 
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
@@ -34,7 +34,7 @@ class EntityToIdTransformer implements DataTransformerInterface
      * @param RegistryInterface $registry
      * @param $class
      */
-    public function __construct(RegistryInterface $registry, $class)
+    public function __construct(ManagerRegistry $registry, $class)
     {
         $this->registry = $registry;
         $this->class = $class;
