@@ -103,7 +103,7 @@ class Service
         $this->clockInActivity = $this->activityRepository->find($this->clockInActivityId);
 
         if (null === $this->clockInActivity || 0 === $this->clockInActivityId) {
-            throw new ClockInException(sprintf('The default clock in activity is not found. Did you configure it via parameter "%s"', 'clock-in.activity'));
+            throw new ClockInException(sprintf('The default ClockIn activity is not found. Did you configure it via parameter "%s"', 'clock-in.activity'));
         }
 
         return $this->clockInActivity;
@@ -132,13 +132,16 @@ class Service
 
     /**
      * @param User|null $user
-     * @return LatestActivity|null
+     * @return LatestActivity|mixed|null
      */
     public function findLatestActivity(User $user = null)
     {
         $user = $this->getUser($user);
         if (null === $this->latestActivity) {
-            $this->latestActivity = $this->latestActivityRepository->getLatestActivity($user);
+            try {
+                $this->latestActivity = $this->latestActivityRepository->getLatestActivity($user);
+            } catch (\Doctrine\ORM\NonUniqueResultException $exception) {
+            }
         }
 
         return $this->latestActivity;
@@ -178,7 +181,14 @@ class Service
     {
         $user = $this->getUser($user);
 
-        if (null !== $latestActivity = $this->findLatestActivity($user)) {
+        $latestActivity = null;
+
+        try {
+            $latestActivity = $this->findLatestActivity($user);
+        } catch(\Exception $e) {
+        }
+
+        if (null !== $latestActivity) {
             return $latestActivity->getTimesheet();
         }
 
@@ -190,7 +200,7 @@ class Service
      * @param Timesheet $timesheet
      * @param null $action
      * @return LatestActivity|null
-     * @throws \Doctrine\ORM\ORMException
+     * @throws ClockInException
      */
     public function manageLatestActivity(User $user, Timesheet $timesheet, $action = null)
     {
@@ -208,7 +218,11 @@ class Service
             ->setTimesheet($timesheet)
             ->setAction($action);
 
-        $this->latestActivityRepository->save($latestActivity);
+        try {
+            $this->latestActivityRepository->save($latestActivity);
+        } catch (\Exception $exception) {
+            throw new ClockInException($exception->getMessage(), $exception->getCode(), $exception);
+        }
 
         return $latestActivity;
     }
@@ -236,6 +250,7 @@ class Service
     /**
      * @param User|null $user
      * @return Timesheet|int|null
+     * @throws ClockInException
      */
     public function stop(User $user = null)
     {
@@ -245,6 +260,7 @@ class Service
     /**
      * @param User|null $user
      * @return Timesheet|int|null
+     * @throws ClockInException
      */
     public function pause(User $user = null)
     {
@@ -298,7 +314,11 @@ class Service
             $entry->setProject($clockInActivity->getProject());
         }
 
-        $this->timesheetRepository->save($entry);
+        try {
+            $this->timesheetRepository->save($entry);
+        } catch (\Exception $exception) {
+            throw new ClockInException($exception->getMessage(), $exception->getCode(), $exception);
+        }
 
         $this->manageLatestActivity($user, $entry, $action);
 
@@ -310,6 +330,7 @@ class Service
      * @param User|null $user
      * @param bool $manageLatestActivity
      * @return Timesheet|int|null
+     * @throws ClockInException
      */
     private function stopAction($action, User $user = null, bool $manageLatestActivity = true)
     {
@@ -329,7 +350,11 @@ class Service
         $activeEntries = array_reverse($activeEntries);
         foreach ($activeEntries as $currentEntry) {
             $timesheet = $currentEntry;
-            $this->timesheetRepository->stopRecording($currentEntry);
+            try {
+                $this->timesheetRepository->stopRecording($currentEntry);
+            } catch (\Exception $exception) {
+                throw new ClockInException($exception->getMessage(), $exception->getCode(), $exception);
+            }
         }
 
         // when called from inside other method, this doesn't need to be called
