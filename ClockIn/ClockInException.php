@@ -9,6 +9,14 @@
 
 namespace KimaiPlugin\ClockInBundle\ClockIn;
 
+use KimaiPlugin\ClockInBundle\Entity\LatestActivity;
+
 class ClockInException extends \Exception
 {
+    public static $error_msg = [
+        LatestActivity::ACTIVITY_START => 'timesheet.is-running',
+        LatestActivity::ACTIVITY_RESUME => 'timesheet.is-running',
+        LatestActivity::ACTIVITY_STOP => 'timesheet.all-stopped',
+        LatestActivity::ACTIVITY_PAUSE => 'timesheet.all-stopped',
+    ];
 }
