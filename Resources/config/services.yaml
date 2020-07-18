@@ -44,3 +44,13 @@ services:
         class:     Doctrine\ORM\EntityRepository
         factory:   ['@doctrine.orm.entity_manager', getRepository]
         arguments: ['KimaiPlugin\ClockInBundle\Entity\LatestActivity']
+
+    # ================================================================================
+    # DATABASE
+    # ================================================================================
+
+    # updates timesheet records
+    KimaiPlugin\ClockInBundle\Doctrine\TimesheetSubscriber:
+        class: KimaiPlugin\ClockInBundle\Doctrine\TimesheetSubscriber
+        tags:
+            - { name: doctrine.event_subscriber, priority: 50 }

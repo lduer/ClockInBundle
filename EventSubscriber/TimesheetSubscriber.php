@@ -9,9 +9,13 @@
 
 namespace KimaiPlugin\ClockInBundle\EventSubscriber;
 
-use App\Event\TimesheetUpdateEvent;
-use KimaiPlugin\ClockInBundle\ClockIn\Service;
+use App\Entity\User;
+use App\Event\TimesheetCreatePostEvent;
+use App\Event\TimesheetUpdatePostEvent;
+use App\Event\TimesheetDeletePreEvent;
+use KimaiPlugin\ClockInBundle\ClockIn\ClockInService;
 use KimaiPlugin\ClockInBundle\Entity\LatestActivity;
+use KimaiPlugin\ClockInBundle\Repository\LatestActivityRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -23,17 +27,24 @@ class TimesheetSubscriber implements EventSubscriberInterface
     public const UPDATE = 'update';
 
     /**
-     * @var Service
+     * @var ClockInService
      */
     protected $service;
 
     /**
-     * TimesheetSubscriber constructor.
-     * @param Service $service
+     * @var LatestActivityRepository
      */
-    public function __construct(Service $service)
+    protected $latestActivityRepository;
+
+    /**
+     * TimesheetSubscriber constructor.
+     * @param ClockInService $service
+     * @param LatestActivityRepository $latestActivityRepository
+     */
+    public function __construct(ClockInService $service, LatestActivityRepository $latestActivityRepository)
     {
         $this->service = $service;
+        $this->latestActivityRepository = $latestActivityRepository;
     }
 
     /**
@@ -42,22 +53,18 @@ class TimesheetSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TimesheetUpdateEvent::TIMESHEET_CREATE => 'onTimesheetCreate',
-            TimesheetUpdateEvent::TIMESHEET_UPDATE => 'onTimesheetUpdate',
-            TimesheetUpdateEvent::TIMESHEET_DELETE => 'onTimesheetDelete',
-            TimesheetUpdateEvent::TIMESHEET_STOP => 'onTimesheetUpdate',
-            TimesheetUpdateEvent::TIMESHEET_RESTART => 'onTimesheetCreate',
+            TimesheetCreatePostEvent::class => 'onTimesheetCreate',
+            TimesheetUpdatePostEvent::class => 'onTimesheetUpdate',
+            TimesheetDeletePreEvent::class => 'onTimesheetDelete',
         ];
     }
 
     /**
-     * @param TimesheetUpdateEvent $event
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @param TimesheetCreatePostEvent $event
      */
-    public function onTimesheetCreate(TimesheetUpdateEvent $event)
+    public function onTimesheetCreate(TimesheetCreatePostEvent $event)
     {
-        $timesheet = $event->getEntity();
+        $timesheet = $event->getTimesheet();
 
         if (null === $timesheet) {
             return;
@@ -69,25 +76,25 @@ class TimesheetSubscriber implements EventSubscriberInterface
         }
 
         $user = $timesheet->getUser();
-        $latestActivity = $this->service->manageLatestActivity($user, $timesheet);
 
-        $this->service->updateLatestActivity($latestActivity);
+        $latestActivity = $this->latestActivityRepository->manageLatestActivity($user, $timesheet);
+
+        $this->updateLatestActivity($latestActivity);
     }
 
     /**
-     * @param TimesheetUpdateEvent $event
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @param TimesheetUpdatePostEvent $event
      */
-    public function onTimesheetUpdate(TimesheetUpdateEvent $event)
+    public function onTimesheetUpdate(TimesheetUpdatePostEvent $event)
     {
-        $timesheet = $event->getEntity();
+        $timesheet = $event->getTimesheet();
 
         if (null === $timesheet || null === $timesheet->getId()) {
+            // no (persisted) timesheet found
             return;
         }
 
-        $latestActivity = $this->service->findLatestActivity($timesheet->getUser());
+        $latestActivity = $this->findLatestActivityTimesheet($timesheet->getUser());
 
         if ($latestActivity->getTimesheet() !== $timesheet) {
             return;
@@ -96,29 +103,30 @@ class TimesheetSubscriber implements EventSubscriberInterface
         if ($timesheet->getEnd() === null) {
             // timesheet is running
             $latestActivity->setAction(null);
-        } elseif ($latestActivity->getTimesheet() === $timesheet) {
+            $latestActivity->setTimesheet($timesheet);
+            $latestActivity->setTime($timesheet->getBegin());
+
+        } else {
             // timesheet is not running.
             $latestActivity->setAction(LatestActivity::ACTIVITY_PAUSE);
             $latestActivity->setTime($timesheet->getEnd());
         }
 
-        $this->service->updateLatestActivity($latestActivity);
+        $this->updateLatestActivity($latestActivity);
     }
 
     /**
-     * @param TimesheetUpdateEvent $event
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @param TimesheetDeletePreEvent $event
      */
-    public function onTimesheetDelete(TimesheetUpdateEvent $event)
+    public function onTimesheetDelete(TimesheetDeletePreEvent $event)
     {
-        $timesheet = $event->getEntity();
+        $timesheet = $event->getTimesheet();
 
         if (null === $timesheet) {
             return;
         }
 
-        $latestActivity = $this->service->findLatestActivity($timesheet->getUser());
+        $latestActivity = $this->findLatestActivityTimesheet($timesheet->getUser());
 
         if ($latestActivity->getTimesheet() !== $timesheet) {
             return;
@@ -127,6 +135,21 @@ class TimesheetSubscriber implements EventSubscriberInterface
         $latestActivity->setAction(LatestActivity::ACTIVITY_STOP);
         $latestActivity->setTimesheet(null);
 
-        $this->service->updateLatestActivity($latestActivity);
+        $this->updateLatestActivity($latestActivity);
+    }
+
+    /**
+     * @param User $user
+     * @return mixed
+     */
+    private function findLatestActivityTimesheet(User $user) {
+        return $this->latestActivityRepository->findLatestActivityTimesheet($user);
+    }
+
+    /**
+     * @param $latestActivity
+     */
+    private function updateLatestActivity($latestActivity) {
+        return $this->latestActivityRepository->updateLatestActivity($latestActivity);
     }
 }

@@ -9,17 +9,13 @@
 
 namespace KimaiPlugin\ClockInBundle\Repository;
 
+use App\Entity\Timesheet;
 use App\Entity\User;
 use Doctrine\ORM\EntityRepository;
 use KimaiPlugin\ClockInBundle\Entity\LatestActivity;
 
 class LatestActivityRepository extends EntityRepository
 {
-    /**
-     * @param User $user
-     * @return mixed|null
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     */
     public function getLatestActivity(User $user)
     {
         $qb = $this->createQueryBuilder('la');
@@ -39,11 +35,6 @@ class LatestActivityRepository extends EntityRepository
         return $result;
     }
 
-    /**
-     * @param LatestActivity $timesheet
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     */
     public function save(LatestActivity $timesheet)
     {
         $entityManager = $this->getEntityManager();
@@ -51,11 +42,6 @@ class LatestActivityRepository extends EntityRepository
         $entityManager->flush();
     }
 
-    /**
-     * @param LatestActivity $latestActivity
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     */
     public function updateLatestActivity(LatestActivity $latestActivity)
     {
         $entityManager = $this->getEntityManager();
@@ -63,15 +49,44 @@ class LatestActivityRepository extends EntityRepository
         $entityManager->flush();
     }
 
-    /**
-     * @param $latestActivity
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     */
-    public function removeLatestActivity($latestActivity)
+    public function removeLatestActivity(LatestActivity $latestActivity)
     {
         $entityManager = $this->getEntityManager();
         $entityManager->remove($latestActivity);
         $entityManager->flush();
+    }
+
+    public function manageLatestActivity(User $user, Timesheet $timesheet, $action = null)
+    {
+        $latestActivity = $this->getLatestActivity($user);
+
+        if (null === $latestActivity) {
+            $latestActivity = new LatestActivity($timesheet, $action, $user);
+
+            $latestActivity
+                ->setAction($action)
+                ->setTimesheet($timesheet);
+        }
+
+        $latestActivity
+            ->setTimesheet($timesheet)
+            ->setAction($action);
+
+        $this->save($latestActivity);
+
+        return $latestActivity;
+    }
+
+    /**
+     * @param User|null $user
+     * @return Timesheet|null
+     */
+    public function findLatestActivityTimesheet(User $user = null)
+    {
+        if (null !== $latestActivity = $this->getLatestActivity($user)) {
+            return $latestActivity->getTimesheet();
+        }
+
+        return null;
     }
 }
